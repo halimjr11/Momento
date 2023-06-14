@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Momento</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="login">Login</string>
+    <string name="login_page_desc">Login Page</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="register">Register</string>
+    <string name="register_page_desc">Register Page</string>
+    <string name="register_email">Email</string>
+    <string name="register_password">Password</string>
+    <string name="register_text_on_login">Create an account? Register </string>
+    <string name="login_text_on_register">Already have an account? Login </string>
+    <string name="register_name">Name</string>
+    <string name="validation_email_text">Invalid Email Address</string>
+    <string name="validation_password_text">Minimum 8 character password</string>
+    <string name="validation_required_text">Required</string>
+    <string name="item_title">Title</string>
+    <string name="item_description">Description</string>
+    <string name="item_location">Location</string>
+    <string name="login_success_text">Successful login into the system</string>
+    <string name="register_success_text">Successful register to the system</string>
+    <string name="login_failed_text">Login failed </string>
+    <string name="register_failed_text">Register failed </string>
+    <string name="token_text" translatable="false">Bearer %token%</string>
+    <string name="unknown_location_text">Location is not found</string>
+    <string name="logout_menu_text">Logout</string>
+    <string name="fab_description">Add story button</string>
+    <string name="add_image_preview">Image preview</string>
+    <string name="button_camera_text">Camera</string>
+    <string name="add_description_text">Description</string>
+    <string name="upload_story_text">Upload</string>
+    <string name="button_gallery_text">Gallery</string>
+    <string name="success_add_story_text">Successful upload story</string>
+    <string name="failed_add_story_text">Failed to upload story, try again!</string>
+    <string name="iv_desc_list_item">Image of list item</string>
+    <string name="error_list_message_text">Story failed to load!</string>
+    <string name="reload_button_text">Reload</string>
+    <string name="setting_theme_label">Theme</string>
+    <string name="setting_language_label">Languages</string>
+    <string name="setting_theme_dark">Dark Mode</string>
+    <string name="setting_theme_light">Light Mode</string>
+    <string name="setting_theme_system">Default</string>
+    <string name="setting_language_id">Indonesia</string>
+    <string name="setting_language_en">English</string>
+    <string name="item_dropdown_placeholder">Item Dropdown</string>
+    <string name="setting_menu_text">Settings</string>
+    <string name="empty_description_text">Data is not found</string>
+    <string name="widget_momento_title">Momento Story</string>
+    <string-array name="themes">
+        <item>@string/setting_theme_system</item>
+        <item>@string/setting_theme_light</item>
+        <item>@string/setting_theme_dark</item>
+    </string-array>
+</resources>

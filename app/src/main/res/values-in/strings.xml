@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Momento</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="login">Login</string>
+    <string name="login_page_desc">Halaman Login</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="register">Register</string>
+    <string name="register_page_desc">Halaman Register</string>
+    <string name="register_email">Email</string>
+    <string name="register_password">Password</string>
+    <string name="register_text_on_login">Buat akun? Daftar</string>
+    <string name="login_text_on_register">Punya akun? Login </string>
+    <string name="register_name">Nama</string>
+    <string name="validation_email_text">Alamat email tidak valid</string>
+    <string name="validation_password_text">Password berisi minimal 8 karakter</string>
+    <string name="validation_required_text">Diperlukan</string>
+    <string name="item_title">Judul</string>
+    <string name="item_description">Deskripsi</string>
+    <string name="item_location">Lokasi</string>
+    <string name="login_success_text">Login ke sistem sukses</string>
+    <string name="register_success_text">Daftar ke sistem sukses</string>
+    <string name="login_failed_text">Login gagal</string>
+    <string name="register_failed_text">Pendaftaran gagal</string>
+    <string name="token_text" translatable="false">Bearer %token%</string>
+    <string name="unknown_location_text">Lokasi tidak ditemukan</string>
+    <string name="logout_menu_text">Logout</string>
+    <string name="fab_description">Tombol tambah story</string>
+    <string name="add_image_preview">Pratinjau gambar</string>
+    <string name="button_camera_text">Kamera</string>
+    <string name="add_description_text">Deskripsi</string>
+    <string name="upload_story_text">Upload</string>
+    <string name="button_gallery_text">Galeri</string>
+    <string name="success_add_story_text">Upload story sukses</string>
+    <string name="failed_add_story_text">Upload story gagal, coba lagi!</string>
+    <string name="iv_desc_list_item">Gambar item</string>
+    <string name="error_list_message_text">Story gagal dimuat!</string>
+    <string name="reload_button_text">Muat ulang</string>
+    <string name="setting_theme_label">Tema</string>
+    <string name="setting_language_label">Bahasa</string>
+    <string name="setting_theme_dark">Mode Gelap</string>
+    <string name="setting_theme_light">Mode Terang</string>
+    <string name="setting_theme_system">Standar</string>
+    <string name="setting_language_id">Indonesia</string>
+    <string name="setting_language_en">Inggris</string>
+    <string name="item_dropdown_placeholder">Dropdown Item</string>
+    <string name="setting_menu_text">Pengaturan</string>
+    <string name="empty_description_text">Data tidak ditemukan</string>
+    <string name="widget_momento_title">Cerita Momento</string>
+    <string-array name="themes">
+        <item>@string/setting_theme_system</item>
+        <item>@string/setting_theme_light</item>
+        <item>@string/setting_theme_dark</item>
+    </string-array>
+    <string-array name="languages">
+        <item>@string/setting_language_en</item>
+        <item>@string/setting_language_id</item>
+    </string-array>
+</resources>
