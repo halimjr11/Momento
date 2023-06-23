@@ -27,6 +27,7 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import com.nurhaqhalim.momento.R
 import com.nurhaqhalim.momento.components.MoDialog
+import com.nurhaqhalim.momento.core.Result
 import com.nurhaqhalim.momento.databinding.ActivityAddStoryBinding
 import com.nurhaqhalim.momento.model.UserData
 import com.nurhaqhalim.momento.utils.GlobalConstants
@@ -95,6 +96,26 @@ class AddStoryActivity : AppCompatActivity() {
         initLiveData()
     }
 
+    private fun initLiveData() {
+        viewModel.getAddStoryResponse().observe(this@AddStoryActivity) { result ->
+            if (result != null) {
+                when (result) {
+                    is Result.Loading -> {
+                        // TODO : add loading handler
+                    }
+
+                    is Result.Success -> {
+                        showSuccessDialog()
+                    }
+
+                    else -> {
+                        showErrorDialog()
+                    }
+                }
+            }
+        }
+    }
+
     private fun getLocations() {
         val minTimeBetweenUpdates = 1000L
         val minDistanceBetweenUpdates = 100f
@@ -141,31 +162,6 @@ class AddStoryActivity : AppCompatActivity() {
         locationTracker.startListening(this)
     }
 
-    private fun initLiveData() {
-        with(viewModel) {
-            errorAddStory.observe(this@AddStoryActivity) {
-                if (it) {
-                    Toast.makeText(this@AddStoryActivity, "error not success", Toast.LENGTH_SHORT)
-                        .show()
-                    showErrorDialog()
-                }
-            }
-
-            errorConnection.observe(this@AddStoryActivity) {
-                if (it) {
-                    Toast.makeText(this@AddStoryActivity, "error not success", Toast.LENGTH_SHORT)
-                        .show()
-                    showErrorDialog()
-                }
-            }
-
-            errorMessage.observe(this@AddStoryActivity) {
-                Toast.makeText(this@AddStoryActivity, "error : $it", Toast.LENGTH_SHORT)
-                    .show()
-            }
-        }
-    }
-
     private fun initListener() {
         with(addStoryBinding) {
             buttonCamera.setOnClickListener {
@@ -188,17 +184,16 @@ class AddStoryActivity : AppCompatActivity() {
 
                 val filePart = MultipartBody.Part.createFormData("photo", fileName, fileRequestBody)
 
+                Toast.makeText(this@AddStoryActivity, "udah ke klik pak!", Toast.LENGTH_SHORT)
+                    .show()
+
                 viewModel.fetchAddStoryUser(
                     resources.getString(R.string.token_text).replace("%token%", userData.token),
                     filePart,
                     descriptions,
                     latitudes,
                     longitudes
-                ).observe(this@AddStoryActivity) {
-                    if (!it.error) {
-                        showSuccessDialog()
-                    }
-                }
+                )
             }
         }
     }

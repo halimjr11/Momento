@@ -2,8 +2,9 @@ package com.nurhaqhalim.momento.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.nurhaqhalim.momento.core.MoRepository
+import com.nurhaqhalim.momento.core.Result
 import com.nurhaqhalim.momento.core.model.AddStoryResponse
 import com.nurhaqhalim.momento.core.model.DetailResponse
 import com.nurhaqhalim.momento.core.model.LoginRequest
@@ -20,21 +21,28 @@ class MoViewModel(application: Application) : AndroidViewModel(application) {
     private val api: ApiEndpoint =
         ApiServices.getInstance(application).create(ApiEndpoint::class.java)
     private val repository = MoRepository(api)
-    val errorLogin: LiveData<Boolean> = repository.errorLogin
-    val errorRegister: LiveData<Boolean> = repository.errorRegister
-    val errorConnection: LiveData<Boolean> = repository.errorConnection
-    val errorStory: LiveData<Boolean> = repository.errorStory
-    val errorDetail: LiveData<Boolean> = repository.errorDetail
-    val errorMessage: LiveData<String> = repository.errorMessage
-    val errorAddStory: LiveData<Boolean> = repository.errorAddStory
-    fun fetchLogin(loginRequest: LoginRequest): LiveData<LoginResponse> =
-        repository.fetchLogin(loginRequest)
+    private var addStoryResponse: MutableLiveData<Result<AddStoryResponse>> = MutableLiveData()
+    private var loginResponse: MutableLiveData<Result<LoginResponse>> = MutableLiveData()
+    private var registerResponse: MutableLiveData<Result<RegisterResponse>> = MutableLiveData()
+    private var detailResponse: MutableLiveData<Result<DetailResponse>> = MutableLiveData()
+    private var storyResponse: MutableLiveData<Result<List<StoryModel>>> = MutableLiveData()
 
-    fun fetchRegister(registerRequest: RegisterRequest): LiveData<RegisterResponse> =
-        repository.fetchRegister(registerRequest)
+    fun getAddStoryResponse() = addStoryResponse
+    fun getLoginResponse() = loginResponse
+    fun getRegisterResponse() = registerResponse
+    fun getDetailResponse() = detailResponse
+    fun getStoryResponse() = storyResponse
+    fun fetchLogin(loginRequest: LoginRequest) {
+        loginResponse.value = repository.fetchLogin(loginRequest)
+    }
 
-    fun fetchStories(token: String, page: Int, size: Int, location: Boolean? = null): LiveData<List<StoryModel>> =
-        repository.fetchStories(token, page, size, location)
+    fun fetchRegister(registerRequest: RegisterRequest) {
+        registerResponse.value = repository.fetchRegister(registerRequest)
+    }
+
+    fun fetchStories(token: String, page: Int, size: Int, location: Int? = null) {
+        storyResponse.value = repository.fetchStories(token, page, size, location)
+    }
 
     fun fetchAddStoryUser(
         token: String,
@@ -42,7 +50,12 @@ class MoViewModel(application: Application) : AndroidViewModel(application) {
         description: RequestBody,
         latitude: RequestBody,
         longitude: RequestBody
-    ): LiveData<AddStoryResponse> = repository.fetchAddStoryUser(token, file, description, latitude, longitude)
+    ) {
+        addStoryResponse.value =
+            repository.fetchAddStoryUser(token, file, description, latitude, longitude)
+    }
 
-    fun fetchGetDetail(token: String, id: String): LiveData<DetailResponse> = repository.fetchGetDetail(token, id)
+    fun fetchGetDetail(token: String, id: String) {
+        detailResponse.value = repository.fetchGetDetail(token, id)
+    }
 }

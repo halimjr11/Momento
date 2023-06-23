@@ -7,7 +7,7 @@ object DataMapper {
     fun listStoryToModel(list: List<StoriesResponse.Story>): List<StoryModel> =
         list.map { story -> storyToModel(story) }.toList()
 
-    private fun storyToModel(story: StoriesResponse.Story): StoryModel = StoryModel(
+    fun storyToModel(story: StoriesResponse.Story): StoryModel = StoryModel(
         createdAt = story.createdAt,
         description = story.description,
         id = story.id,
