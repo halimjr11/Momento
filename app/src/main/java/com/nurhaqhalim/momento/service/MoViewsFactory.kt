@@ -30,7 +30,7 @@ class MoViewsFactory(private val context: Context) : RemoteViewsService.RemoteVi
                 context.resources.getString(R.string.token_text)
                     .replace("%token%", userData.token)
             )
-            data = DataMapper.listStoryToModel(list.execute().body()?.listStory ?: mutableListOf())
+            data = DataMapper.listStoryToModel(list.listStory)
         }
     }
 

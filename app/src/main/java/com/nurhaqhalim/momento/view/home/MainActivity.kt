@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +23,7 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.nurhaqhalim.momento.R
+import com.nurhaqhalim.momento.core.Result
 import com.nurhaqhalim.momento.databinding.ActivityMainBinding
 import com.nurhaqhalim.momento.model.StoryModel
 import com.nurhaqhalim.momento.model.UserData
@@ -56,7 +58,13 @@ class MainActivity : AppCompatActivity() {
         userData = StorageHelper.getUserData(this)
         supportActionBar?.title = resources.getText(R.string.app_name)
         storyAdapter = MoStoryAdapter()
-        storyAdapter.setData(listData)
+        fetchData()
+        initView()
+        initLiveData()
+        initListener()
+    }
+
+    private fun initView() {
         with(mainBinding) {
             showLoading()
             recyclerView.apply {
@@ -75,7 +83,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
             }
-            fetchData()
+            storyAdapter.setData(listData)
             fabAddStory.setOnClickListener {
                 getLocation()
                 Intent(this@MainActivity, AddStoryActivity::class.java).apply {
@@ -83,6 +91,58 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun initLiveData() {
+        viewModel.getStoryResponse().observe(this) { result ->
+            if (result != null) {
+                when (result) {
+                    is Result.Loading -> {
+                        showLoading()
+                    }
+
+                    is Result.Success -> {
+                        hideLoading()
+                        if (page == 1) {
+                            if (result.data.isNotEmpty()) {
+                                GlobalConstants.show(
+                                    mainBinding.recyclerView,
+                                    mainBinding.emptyState,
+                                    mainBinding.errorState
+                                )
+                                listData.addAll(result.data)
+                                storyAdapter.notifyDataSetChanged()
+                            } else {
+                                GlobalConstants.show(
+                                    mainBinding.emptyState,
+                                    mainBinding.recyclerView,
+                                    mainBinding.errorState
+                                )
+                            }
+                        } else {
+                            listData.remove(null)
+                            val scrollPosition: Int = listData.size
+                            storyAdapter.notifyItemRemoved(scrollPosition)
+
+                            listData.addAll(result.data)
+                            storyAdapter.notifyDataSetChanged()
+                        }
+                    }
+
+                    else -> {
+                        hideLoading()
+                        GlobalConstants.show(
+                            mainBinding.errorState,
+                            mainBinding.recyclerView,
+                            mainBinding.emptyState
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun initListener() {
         storyAdapter
             .setOnItemClickListener(object : MoStoryAdapter.onClickListener {
                 override fun onItemClicked(data: StoryModel) {
@@ -154,32 +214,7 @@ class MainActivity : AppCompatActivity() {
             resources.getString(R.string.token_text).replace("%token%", userData.token),
             page,
             currentSize
-        ).observe(this) {
-            if (it.isNotEmpty()) {
-                GlobalConstants.show(
-                    mainBinding.recyclerView,
-                    mainBinding.emptyState,
-                    mainBinding.errorState
-                )
-                listData.addAll(it)
-                storyAdapter.notifyDataSetChanged()
-            } else {
-                GlobalConstants.show(
-                    mainBinding.emptyState,
-                    mainBinding.recyclerView,
-                    mainBinding.errorState
-                )
-            }
-            hideLoading()
-        }
-        viewModel.errorStory.observe(this) {
-            GlobalConstants.show(
-                mainBinding.errorState,
-                mainBinding.recyclerView,
-                mainBinding.emptyState
-            )
-            hideLoading()
-        }
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -211,22 +246,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadMore() {
-        listData.add(null)
-        storyAdapter.notifyItemInserted(listData.size - 1)
+        if (listData[listData.size-1] != null) {
+            listData.add(null)
+            storyAdapter.notifyItemInserted(listData.size - 1)
+        }
         Handler(mainLooper).postDelayed({
             page++
-            viewModel.fetchStories(
-                resources.getString(R.string.token_text).replace("%token%", userData.token),
-                page,
-                currentSize
-            ).observe(this) {
-                listData.remove(null)
-                val scrollPosition: Int = listData.size
-                storyAdapter.notifyItemRemoved(scrollPosition)
-
-                listData.addAll(it)
-                storyAdapter.notifyDataSetChanged()
-            }
+            fetchData()
         }, 1000L)
     }
 

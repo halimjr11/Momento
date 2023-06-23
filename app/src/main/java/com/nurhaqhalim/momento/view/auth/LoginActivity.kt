@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import coil.load
 import com.nurhaqhalim.momento.R
 import com.nurhaqhalim.momento.components.MoDialog
+import com.nurhaqhalim.momento.core.Result
 import com.nurhaqhalim.momento.core.model.LoginRequest
 import com.nurhaqhalim.momento.databinding.ActivityLoginBinding
 import com.nurhaqhalim.momento.model.UserData
@@ -59,11 +60,21 @@ class LoginActivity : AppCompatActivity() {
             }
             edLoginPassword.apply {
                 addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    override fun beforeTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
                         // Not used
                     }
 
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    override fun onTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
                         // Not used
                     }
 
@@ -74,7 +85,8 @@ class LoginActivity : AppCompatActivity() {
                 })
                 setOnEditorActionListener { _, i, _ ->
                     if (i == EditorInfo.IME_ACTION_DONE) {
-                        val inputManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                        val inputManager =
+                            getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                         val viewFocus = currentFocus
                         inputManager.hideSoftInputFromWindow(viewFocus?.windowToken, 0)
                     }
@@ -83,16 +95,32 @@ class LoginActivity : AppCompatActivity() {
             }
 
             btnLogin.setOnClickListener {
-                showLoading()
                 val email = edLoginEmail.text.toString().trim()
                 val password = edLoginPassword.text.toString().trim()
                 if (email.isNotEmpty() && password.isNotEmpty()) {
                     val loginRequest = LoginRequest(email, password)
-                    viewModel.fetchLogin(loginRequest).observe(this@LoginActivity) {
+                    viewModel.fetchLogin(loginRequest)
+                }
+            }
+        }
+        initLiveData()
+    }
+
+    private fun initLiveData() {
+        viewModel.getLoginResponse().observe(this@LoginActivity) { result ->
+            if (result != null) {
+                when (result) {
+                    is Result.Loading -> {
+                        showLoading()
+                    }
+
+                    is Result.Success -> {
                         hideLoading()
-                        if (!it.error) {
+                        if (!result.data.error) {
                             val userData = UserData(
-                                it.loginResult.name, it.loginResult.token, it.loginResult.userId
+                                result.data.loginResult.name,
+                                result.data.loginResult.token,
+                                result.data.loginResult.userId
                             )
                             StorageHelper.saveUserLogin(this@LoginActivity, userData)
                             showSuccessDialog()
@@ -100,11 +128,10 @@ class LoginActivity : AppCompatActivity() {
                             showErrorDialog()
                         }
                     }
-                    viewModel.errorLogin.observe(this@LoginActivity) {
-                        if (it) {
-                            hideLoading()
-                            showErrorDialog()
-                        }
+
+                    else -> {
+                        hideLoading()
+                        showErrorDialog()
                     }
                 }
             }

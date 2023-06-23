@@ -9,7 +9,6 @@ import com.nurhaqhalim.momento.core.model.RegisterResponse
 import com.nurhaqhalim.momento.core.model.StoriesResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -22,29 +21,32 @@ import retrofit2.http.Query
 interface ApiEndpoint {
 
     @POST("login")
-    fun login(@Body loginRequest: LoginRequest): Call<LoginResponse>
+    suspend fun login(@Body loginRequest: LoginRequest): LoginResponse
 
     @POST("register")
-    fun register(@Body registerRequest: RegisterRequest): Call<RegisterResponse>
+    suspend fun register(@Body registerRequest: RegisterRequest): RegisterResponse
 
     @Multipart
     @POST("stories")
-    fun addStoryWithAuth(
-        @Header("Authorization") token : String,
+    suspend fun addStoryWithAuth(
+        @Header("Authorization") token: String,
         @Part photo: MultipartBody.Part,
         @Part("description") description: RequestBody,
         @Part("lat") latitude: RequestBody?,
         @Part("lon") longitude: RequestBody?
-    ): Call<AddStoryResponse>
+    ): AddStoryResponse
 
     @GET("stories")
-    fun getStories(
-        @Header("Authorization") token : String,
+    suspend fun getStories(
+        @Header("Authorization") token: String,
         @Query("page") page: Int? = null,
         @Query("size") size: Int? = null,
-        @Query("location") location: Boolean? = false,
-    ): Call<StoriesResponse>
+        @Query("location") location: Int? = 0,
+    ): StoriesResponse
 
     @GET("stories/{id}")
-    fun getDetail(@Header("Authorization") token : String, @Path("id") id: String) : Call<DetailResponse>
+    suspend fun getDetail(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): DetailResponse
 }

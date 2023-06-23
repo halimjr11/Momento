@@ -15,7 +15,7 @@ import com.nurhaqhalim.momento.view.adapter.MoArrayAdapter
 
 class SettingActivity : AppCompatActivity() {
     private lateinit var settingBinding: ActivitySettingBinding
-    private lateinit var themeAdapter : MoArrayAdapter
+    private lateinit var themeAdapter: MoArrayAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         settingBinding = ActivitySettingBinding.inflate(layoutInflater)
@@ -34,27 +34,33 @@ class SettingActivity : AppCompatActivity() {
     private fun initThemeSettings() {
         val settingThemeModel = GlobalConstants.getThemeModel()
         val themeTitleList = settingThemeModel.title.map { resources.getString(it) }.toList()
-            themeAdapter =
-                MoArrayAdapter(this@SettingActivity, themeTitleList, settingThemeModel.icon)
-        with(settingBinding){
+        themeAdapter =
+            MoArrayAdapter(this@SettingActivity, themeTitleList, settingThemeModel.icon)
+        with(settingBinding) {
             themePicker.apply {
-                text = when(SettingUtils.getTheme()) {
+                text = when (SettingUtils.getTheme()) {
                     AppCompatDelegate.MODE_NIGHT_YES -> {
-                        Editable.Factory.getInstance().newEditable(resources.getString(R.string.setting_theme_dark))
+                        Editable.Factory.getInstance()
+                            .newEditable(resources.getString(R.string.setting_theme_dark))
                     }
 
                     AppCompatDelegate.MODE_NIGHT_NO -> {
-                        Editable.Factory.getInstance().newEditable(resources.getString(R.string.setting_theme_light))
+                        Editable.Factory.getInstance()
+                            .newEditable(resources.getString(R.string.setting_theme_light))
                     }
 
                     else -> {
-                        Editable.Factory.getInstance().newEditable(resources.getString(R.string.setting_theme_system))
+                        Editable.Factory.getInstance()
+                            .newEditable(resources.getString(R.string.setting_theme_system))
                     }
                 }
                 setOnItemClickListener { adapterView, view, position, id ->
                     when (settingThemeModel.title[position]) {
                         R.string.setting_theme_system -> {
-                            SettingUtils.updateTheme(this@SettingActivity, DarkMode.FOLLOW_SYSTEM.value)
+                            SettingUtils.updateTheme(
+                                this@SettingActivity,
+                                DarkMode.FOLLOW_SYSTEM.value
+                            )
                         }
 
                         R.string.setting_theme_light -> {

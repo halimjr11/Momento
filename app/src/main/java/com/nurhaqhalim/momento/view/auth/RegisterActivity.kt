@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import coil.load
 import com.nurhaqhalim.momento.R
 import com.nurhaqhalim.momento.components.MoDialog
+import com.nurhaqhalim.momento.core.Result
 import com.nurhaqhalim.momento.core.model.RegisterRequest
 import com.nurhaqhalim.momento.databinding.ActivityRegisterBinding
 import com.nurhaqhalim.momento.utils.GlobalConstants
@@ -57,11 +58,21 @@ class RegisterActivity : AppCompatActivity() {
             }
             edRegisterPassword.apply {
                 addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    override fun beforeTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
                         // Not used
                     }
 
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    override fun onTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
                         // Not used
                     }
 
@@ -88,20 +99,33 @@ class RegisterActivity : AppCompatActivity() {
                 val password = edRegisterPassword.text.toString().trim()
                 if (email.isNotEmpty() && name.isNotEmpty() && password.isNotEmpty()) {
                     val registerRequest = RegisterRequest(email, name, password)
-                    viewModel.fetchRegister(registerRequest).observe(this@RegisterActivity) {
+                    viewModel.fetchRegister(registerRequest)
+                }
+            }
+        }
+        initLiveData()
+    }
+
+    private fun initLiveData() {
+        viewModel.getRegisterResponse().observe(this@RegisterActivity) { result ->
+            if (result != null) {
+                when (result) {
+                    is Result.Loading -> {
+                        showLoading()
+                    }
+
+                    is Result.Success -> {
                         hideLoading()
-                        if (!it.error) {
+                        if (!result.data.error) {
                             showSuccessDialog()
                         } else {
                             showErrorDialog()
                         }
                     }
 
-                    viewModel.errorRegister.observe(this@RegisterActivity) {
+                    else -> {
                         hideLoading()
-                        if (it) {
-                            showErrorDialog()
-                        }
+                        showErrorDialog()
                     }
                 }
             }
