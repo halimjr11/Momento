@@ -34,10 +34,11 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         authBinding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(authBinding.root)
+        supportActionBar?.title = resources.getString(R.string.login_title_text)
         with(authBinding) {
             loginImage.load(R.drawable.momento)
             loginTitle.text = resources.getText(R.string.app_name)
-            loginDescription.text = resources.getText(R.string.login_page_desc)
+            loginDescription.text = resources.getText(R.string.login_title_text)
             btnLogin.text = resources.getText(R.string.login)
             val ss = SpannableString(resources.getText(R.string.register_text_on_login))
             val clickableSpan: ClickableSpan = object : ClickableSpan() {

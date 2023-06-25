@@ -12,7 +12,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,6 +32,7 @@ import com.nurhaqhalim.momento.utils.StorageHelper
 import com.nurhaqhalim.momento.utils.StorageHelper.set
 import com.nurhaqhalim.momento.view.adapter.MoStoryAdapter
 import com.nurhaqhalim.momento.view.auth.LoginActivity
+import com.nurhaqhalim.momento.view.maps.MapsActivity
 import com.nurhaqhalim.momento.view.settings.SettingActivity
 import com.nurhaqhalim.momento.view.story.add.AddStoryActivity
 import com.nurhaqhalim.momento.view.story.detail.DetailActivity
@@ -219,6 +219,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.action_maps -> {
+                Intent(this, MapsActivity::class.java).apply {
+                    startActivity(this)
+                }
+            }
+
             R.id.action_setting -> {
                 Intent(this, SettingActivity::class.java).apply {
                     startActivity(this)
@@ -246,7 +252,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadMore() {
-        if (listData[listData.size-1] != null) {
+        if (listData[listData.size - 1] != null) {
             listData.add(null)
             storyAdapter.notifyItemInserted(listData.size - 1)
         }

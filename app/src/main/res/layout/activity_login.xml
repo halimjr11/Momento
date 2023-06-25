@@ -43,7 +43,7 @@
             android:layout_marginBottom="12dp"
             android:fontFamily="@font/poppins"
             android:textSize="12sp"
-            tools:text="@string/login_page_desc" />
+            tools:text="@string/login_title_text" />
 
         <com.nurhaqhalim.momento.components.MoEditText
             android:id="@+id/ed_login_email"

@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Momento</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="login">Login</string>
-    <string name="login_page_desc">Halaman Login</string>
+    <string name="login_title_text">Halaman Login</string>
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
     <string name="register">Register</string>
-    <string name="register_page_desc">Halaman Register</string>
+    <string name="register_title_text">Halaman Register</string>
     <string name="register_email">Email</string>
     <string name="register_password">Password</string>
     <string name="register_text_on_login">Buat akun? Daftar</string>
@@ -48,13 +47,14 @@
     <string name="setting_menu_text">Pengaturan</string>
     <string name="empty_description_text">Data tidak ditemukan</string>
     <string name="widget_momento_title">Cerita Momento</string>
+    <string name="maps_menu_text">Maps</string>
+    <string name="maps_title_text">Peta Cerita</string>
+    <string name="settings_title_text">Pengaturan</string>
+    <string name="add_story_title_text">Tambah Cerita</string>
+    <string name="detail_story_title_text">Detail Cerita</string>
     <string-array name="themes">
         <item>@string/setting_theme_system</item>
         <item>@string/setting_theme_light</item>
         <item>@string/setting_theme_dark</item>
-    </string-array>
-    <string-array name="languages">
-        <item>@string/setting_language_en</item>
-        <item>@string/setting_language_id</item>
     </string-array>
 </resources>

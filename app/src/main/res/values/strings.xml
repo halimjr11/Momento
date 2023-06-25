@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Momento</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="login">Login</string>
-    <string name="login_page_desc">Login Page</string>
+    <string name="login_title_text">Login Page</string>
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
     <string name="register">Register</string>
-    <string name="register_page_desc">Register Page</string>
+    <string name="register_title_text">Register Page</string>
     <string name="register_email">Email</string>
     <string name="register_password">Password</string>
     <string name="register_text_on_login">Create an account? Register </string>
@@ -48,6 +47,11 @@
     <string name="setting_menu_text">Settings</string>
     <string name="empty_description_text">Data is not found</string>
     <string name="widget_momento_title">Momento Story</string>
+    <string name="maps_menu_text">Maps</string>
+    <string name="maps_title_text">Story Maps</string>
+    <string name="settings_title_text">Settings</string>
+    <string name="add_story_title_text">Add Story</string>
+    <string name="detail_story_title_text">Story Detail</string>
     <string-array name="themes">
         <item>@string/setting_theme_system</item>
         <item>@string/setting_theme_light</item>

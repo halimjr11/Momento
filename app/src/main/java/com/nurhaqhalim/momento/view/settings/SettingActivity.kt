@@ -20,6 +20,7 @@ class SettingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         settingBinding = ActivitySettingBinding.inflate(layoutInflater)
         setContentView(settingBinding.root)
+        supportActionBar?.title = resources.getString(R.string.settings_title_text)
         with(settingBinding) {
             initThemeSettings()
             languagePicker.apply {
