@@ -27,6 +27,7 @@ class DetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         detailBinding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(detailBinding.root)
+        supportActionBar?.title = resources.getString(R.string.detail_story_title_text)
         userData = StorageHelper.getUserData(this)
         storyData = intent?.getParcelableExtra(STORY_DATA)
         fetchData()

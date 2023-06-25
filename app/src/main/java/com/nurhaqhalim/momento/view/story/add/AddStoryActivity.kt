@@ -67,6 +67,7 @@ class AddStoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         addStoryBinding = ActivityAddStoryBinding.inflate(layoutInflater)
         setContentView(addStoryBinding.root)
+        supportActionBar?.title = resources.getString(R.string.add_story_title_text)
         getLocations()
         userData = StorageHelper.getUserData(this)
         takePhoto = registerForActivityResult(

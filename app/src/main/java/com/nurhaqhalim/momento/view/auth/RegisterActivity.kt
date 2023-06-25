@@ -32,10 +32,11 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         registerBinding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(registerBinding.root)
+        supportActionBar?.title = resources.getString(R.string.register_title_text)
         with(registerBinding) {
             registerImage.load(R.drawable.momento)
             registerTitle.text = resources.getText(R.string.app_name)
-            registerDescription.text = resources.getText(R.string.register_page_desc)
+            registerDescription.text = resources.getText(R.string.register_title_text)
             btnRegister.text = resources.getText(R.string.register)
             val ss = SpannableString(resources.getText(R.string.login_text_on_register))
             val clickableSpan: ClickableSpan = object : ClickableSpan() {
