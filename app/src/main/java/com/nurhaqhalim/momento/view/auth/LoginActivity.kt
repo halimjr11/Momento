@@ -19,7 +19,7 @@ import coil.load
 import com.nurhaqhalim.momento.R
 import com.nurhaqhalim.momento.components.MoDialog
 import com.nurhaqhalim.momento.core.Result
-import com.nurhaqhalim.momento.core.model.LoginRequest
+import com.nurhaqhalim.momento.core.remote.model.LoginRequest
 import com.nurhaqhalim.momento.databinding.ActivityLoginBinding
 import com.nurhaqhalim.momento.model.UserData
 import com.nurhaqhalim.momento.utils.GlobalConstants

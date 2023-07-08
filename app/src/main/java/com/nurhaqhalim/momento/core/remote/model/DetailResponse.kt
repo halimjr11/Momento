@@ -1,4 +1,4 @@
-package com.nurhaqhalim.momento.core.model
+package com.nurhaqhalim.momento.core.remote.model
 
 
 import android.os.Parcelable

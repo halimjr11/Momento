@@ -5,8 +5,8 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.bumptech.glide.Glide
 import com.nurhaqhalim.momento.R
-import com.nurhaqhalim.momento.core.services.ApiEndpoint
-import com.nurhaqhalim.momento.core.services.ApiServices
+import com.nurhaqhalim.momento.core.remote.services.ApiEndpoint
+import com.nurhaqhalim.momento.core.remote.services.ApiServices
 import com.nurhaqhalim.momento.model.StoryModel
 import com.nurhaqhalim.momento.utils.DataMapper
 import com.nurhaqhalim.momento.utils.GlobalConstants

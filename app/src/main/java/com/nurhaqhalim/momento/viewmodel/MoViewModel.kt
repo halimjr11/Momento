@@ -3,24 +3,20 @@ package com.nurhaqhalim.momento.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.nurhaqhalim.momento.core.MoRepository
 import com.nurhaqhalim.momento.core.Result
-import com.nurhaqhalim.momento.core.model.AddStoryResponse
-import com.nurhaqhalim.momento.core.model.DetailResponse
-import com.nurhaqhalim.momento.core.model.LoginRequest
-import com.nurhaqhalim.momento.core.model.LoginResponse
-import com.nurhaqhalim.momento.core.model.RegisterRequest
-import com.nurhaqhalim.momento.core.model.RegisterResponse
-import com.nurhaqhalim.momento.core.services.ApiEndpoint
-import com.nurhaqhalim.momento.core.services.ApiServices
+import com.nurhaqhalim.momento.core.remote.model.AddStoryResponse
+import com.nurhaqhalim.momento.core.remote.model.DetailResponse
+import com.nurhaqhalim.momento.core.remote.model.LoginRequest
+import com.nurhaqhalim.momento.core.remote.model.LoginResponse
+import com.nurhaqhalim.momento.core.remote.model.RegisterRequest
+import com.nurhaqhalim.momento.core.remote.model.RegisterResponse
+import com.nurhaqhalim.momento.di.MoInjection
 import com.nurhaqhalim.momento.model.StoryModel
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
 class MoViewModel(application: Application) : AndroidViewModel(application) {
-    private val api: ApiEndpoint =
-        ApiServices.getInstance(application).create(ApiEndpoint::class.java)
-    private val repository = MoRepository(api)
+    private val repository = MoInjection.retrieveRepository(application)
     private var addStoryResponse: MutableLiveData<Result<AddStoryResponse>> = MutableLiveData()
     private var loginResponse: MutableLiveData<Result<LoginResponse>> = MutableLiveData()
     private var registerResponse: MutableLiveData<Result<RegisterResponse>> = MutableLiveData()
@@ -32,6 +28,8 @@ class MoViewModel(application: Application) : AndroidViewModel(application) {
     fun getRegisterResponse() = registerResponse
     fun getDetailResponse() = detailResponse
     fun getStoryResponse() = storyResponse
+
+    fun fetchPagingList() = repository.fetchPagingList()
     fun fetchLogin(loginRequest: LoginRequest) {
         loginResponse.value = repository.fetchLogin(loginRequest)
     }
