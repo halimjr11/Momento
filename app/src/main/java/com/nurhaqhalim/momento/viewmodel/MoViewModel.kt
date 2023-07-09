@@ -3,6 +3,8 @@ package com.nurhaqhalim.momento.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.nurhaqhalim.momento.core.Result
 import com.nurhaqhalim.momento.core.remote.model.AddStoryResponse
 import com.nurhaqhalim.momento.core.remote.model.DetailResponse
@@ -29,7 +31,7 @@ class MoViewModel(application: Application) : AndroidViewModel(application) {
     fun getDetailResponse() = detailResponse
     fun getStoryResponse() = storyResponse
 
-    fun fetchPagingList() = repository.fetchPagingList()
+    fun fetchPagingList() = repository.fetchPagingList().cachedIn(viewModelScope)
     fun fetchLogin(loginRequest: LoginRequest) {
         loginResponse.value = repository.fetchLogin(loginRequest)
     }

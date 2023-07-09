@@ -11,7 +11,7 @@ import com.nurhaqhalim.momento.core.local.model.StoryEntity
 @Dao
 interface MoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertStory(quote: List<StoryEntity>)
+    suspend fun insertStory(story: List<StoryEntity>)
 
     @Query("SELECT * FROM story")
     fun retrieveAllStory(): PagingSource<Int, StoryEntity>

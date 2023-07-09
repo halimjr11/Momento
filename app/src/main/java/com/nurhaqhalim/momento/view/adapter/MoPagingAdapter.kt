@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
+import coil.ImageLoader
+import coil.memory.MemoryCache
+import coil.request.ImageRequest
 import com.nurhaqhalim.momento.core.local.model.StoryEntity
 import com.nurhaqhalim.momento.databinding.ItemStoryBinding
 import com.nurhaqhalim.momento.model.StoryModel
@@ -26,7 +28,18 @@ class MoPagingAdapter : PagingDataAdapter<StoryEntity, MoPagingAdapter.ViewHolde
         val story = getItem(position)
         holder.binding.apply {
             if (story != null) {
-                itemImage.load(story.photoUrl)
+                val imageLoader = ImageLoader.Builder(this.root.context)
+                    .memoryCache {
+                        MemoryCache.Builder(this.root.context).maxSizePercent(0.25).build()
+                    }
+                    .crossfade(true)
+                    .build()
+
+                val imageRequest = ImageRequest.Builder(this.root.context)
+                    .data(story.photoUrl)
+                    .target(itemImage)
+                    .build()
+                imageLoader.enqueue(imageRequest)
                 itemTitle.text = story.name
                 itemLocation.text =
                     GlobalConstants.getAddress(this.root.context, story.lat, story.lon)

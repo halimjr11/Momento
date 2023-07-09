@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:app="http://schemas.android.com/apk/res-auto"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/tv_item_dropdown"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fontFamily="@font/poppins_medium"
     android:drawablePadding="10dp"
+    android:fontFamily="@font/poppins_medium"
     android:padding="14sp"
+    android:text="@string/item_dropdown_placeholder"
     android:textColor="@color/title_text_color"
     android:textSize="16sp"
     android:textStyle="bold"
-    android:text="@string/item_dropdown_placeholder"
     app:drawableStartCompat="@drawable/ic_language" />
