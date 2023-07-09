@@ -1,19 +1,35 @@
 package com.nurhaqhalim.momento.core
 
-import com.nurhaqhalim.momento.core.model.AddStoryResponse
-import com.nurhaqhalim.momento.core.model.DetailResponse
-import com.nurhaqhalim.momento.core.model.LoginRequest
-import com.nurhaqhalim.momento.core.model.LoginResponse
-import com.nurhaqhalim.momento.core.model.RegisterRequest
-import com.nurhaqhalim.momento.core.model.RegisterResponse
-import com.nurhaqhalim.momento.core.services.ApiEndpoint
+import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.liveData
+import com.nurhaqhalim.momento.core.local.database.MoDatabase
+import com.nurhaqhalim.momento.core.local.model.StoryEntity
+import com.nurhaqhalim.momento.core.remote.model.AddStoryResponse
+import com.nurhaqhalim.momento.core.remote.model.DetailResponse
+import com.nurhaqhalim.momento.core.remote.model.LoginRequest
+import com.nurhaqhalim.momento.core.remote.model.LoginResponse
+import com.nurhaqhalim.momento.core.remote.model.RegisterRequest
+import com.nurhaqhalim.momento.core.remote.model.RegisterResponse
+import com.nurhaqhalim.momento.core.remote.services.ApiEndpoint
 import com.nurhaqhalim.momento.model.StoryModel
 import com.nurhaqhalim.momento.utils.DataMapper
 import kotlinx.coroutines.runBlocking
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
-class MoRepository(private val api: ApiEndpoint) {
+class MoRepository(
+    private val context: Context,
+    private val api: ApiEndpoint,
+    private val moDatabase: MoDatabase
+) {
+
+    val storyPagingList = MutableLiveData<PagingData<StoryEntity>>()
 
     fun fetchStories(
         token: String,
@@ -34,6 +50,20 @@ class MoRepository(private val api: ApiEndpoint) {
                 Result.Error(e.message.toString())
             }
         }
+    }
+
+    @OptIn(ExperimentalPagingApi::class)
+    fun fetchPagingList(): LiveData<PagingData<StoryEntity>> {
+        return Pager(
+            config = PagingConfig(
+                enablePlaceholders = true,
+                pageSize = 10
+            ),
+            remoteMediator = MoRemoteMediator(context, moDatabase, api),
+            pagingSourceFactory = {
+                moDatabase.moDao().retrieveAllStory()
+            }
+        ).liveData
     }
 
     fun fetchLogin(loginRequest: LoginRequest): Result<LoginResponse> {

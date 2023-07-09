@@ -1,4 +1,4 @@
-package com.nurhaqhalim.momento.core.model
+package com.nurhaqhalim.momento.core.remote.model
 
 
 import android.os.Parcelable
@@ -8,9 +8,11 @@ import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
-data class LoginRequest(
+data class RegisterRequest(
     @SerializedName("email")
     val email: String,
+    @SerializedName("name")
+    val name: String,
     @SerializedName("password")
     val password: String
 ) : Parcelable

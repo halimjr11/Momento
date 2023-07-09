@@ -19,7 +19,7 @@ import coil.load
 import com.nurhaqhalim.momento.R
 import com.nurhaqhalim.momento.components.MoDialog
 import com.nurhaqhalim.momento.core.Result
-import com.nurhaqhalim.momento.core.model.RegisterRequest
+import com.nurhaqhalim.momento.core.remote.model.RegisterRequest
 import com.nurhaqhalim.momento.databinding.ActivityRegisterBinding
 import com.nurhaqhalim.momento.utils.GlobalConstants
 import com.nurhaqhalim.momento.viewmodel.MoViewModel

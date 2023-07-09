@@ -1,12 +1,12 @@
-package com.nurhaqhalim.momento.core.services
+package com.nurhaqhalim.momento.core.remote.services
 
-import com.nurhaqhalim.momento.core.model.AddStoryResponse
-import com.nurhaqhalim.momento.core.model.DetailResponse
-import com.nurhaqhalim.momento.core.model.LoginRequest
-import com.nurhaqhalim.momento.core.model.LoginResponse
-import com.nurhaqhalim.momento.core.model.RegisterRequest
-import com.nurhaqhalim.momento.core.model.RegisterResponse
-import com.nurhaqhalim.momento.core.model.StoriesResponse
+import com.nurhaqhalim.momento.core.remote.model.AddStoryResponse
+import com.nurhaqhalim.momento.core.remote.model.DetailResponse
+import com.nurhaqhalim.momento.core.remote.model.LoginRequest
+import com.nurhaqhalim.momento.core.remote.model.LoginResponse
+import com.nurhaqhalim.momento.core.remote.model.RegisterRequest
+import com.nurhaqhalim.momento.core.remote.model.RegisterResponse
+import com.nurhaqhalim.momento.core.remote.model.StoriesResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body

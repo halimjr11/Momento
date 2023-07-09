@@ -9,20 +9,18 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.nurhaqhalim.momento.R
-import com.nurhaqhalim.momento.core.Result
 import com.nurhaqhalim.momento.databinding.ActivityMainBinding
 import com.nurhaqhalim.momento.model.StoryModel
 import com.nurhaqhalim.momento.model.UserData
@@ -30,7 +28,7 @@ import com.nurhaqhalim.momento.utils.GlobalConstants
 import com.nurhaqhalim.momento.utils.MarginItemDecoration
 import com.nurhaqhalim.momento.utils.StorageHelper
 import com.nurhaqhalim.momento.utils.StorageHelper.set
-import com.nurhaqhalim.momento.view.adapter.MoStoryAdapter
+import com.nurhaqhalim.momento.view.adapter.MoPagingAdapter
 import com.nurhaqhalim.momento.view.auth.LoginActivity
 import com.nurhaqhalim.momento.view.maps.MapsActivity
 import com.nurhaqhalim.momento.view.settings.SettingActivity
@@ -41,15 +39,12 @@ import com.nurhaqhalim.momento.viewmodel.MoViewModel
 @SuppressLint("NotifyDataSetChanged")
 class MainActivity : AppCompatActivity() {
     private lateinit var mainBinding: ActivityMainBinding
-    private lateinit var storyAdapter: MoStoryAdapter
+    private lateinit var storyAdapter: MoPagingAdapter
     private lateinit var userData: UserData
     private lateinit var locationManager: LocationManager
     private val viewModel: MoViewModel by viewModels()
-    private val listData = arrayListOf<StoryModel?>()
     private val minDistanceForUpdates: Float = 10f
     private val minTimesBetweenUpdates: Long = 1000
-    private var page = 1
-    private var currentSize = 10
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -57,14 +52,14 @@ class MainActivity : AppCompatActivity() {
         checkLocationPermission()
         userData = StorageHelper.getUserData(this)
         supportActionBar?.title = resources.getText(R.string.app_name)
-        storyAdapter = MoStoryAdapter()
+        storyAdapter = MoPagingAdapter()
         fetchData()
         initView()
-        initLiveData()
         initListener()
     }
 
     private fun initView() {
+        Toast.makeText(this, "home screen", Toast.LENGTH_SHORT).show()
         with(mainBinding) {
             showLoading()
             recyclerView.apply {
@@ -72,18 +67,7 @@ class MainActivity : AppCompatActivity() {
                 adapter = storyAdapter
                 hasFixedSize()
                 addItemDecoration(MarginItemDecoration(40, 15))
-                addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        super.onScrolled(recyclerView, dx, dy)
-                        val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager?
-
-                        if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == listData.size - 1) {
-                            loadMore()
-                        }
-                    }
-                })
             }
-            storyAdapter.setData(listData)
             fabAddStory.setOnClickListener {
                 getLocation()
                 Intent(this@MainActivity, AddStoryActivity::class.java).apply {
@@ -93,58 +77,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initLiveData() {
-        viewModel.getStoryResponse().observe(this) { result ->
-            if (result != null) {
-                when (result) {
-                    is Result.Loading -> {
-                        showLoading()
-                    }
-
-                    is Result.Success -> {
-                        hideLoading()
-                        if (page == 1) {
-                            if (result.data.isNotEmpty()) {
-                                GlobalConstants.show(
-                                    mainBinding.recyclerView,
-                                    mainBinding.emptyState,
-                                    mainBinding.errorState
-                                )
-                                listData.addAll(result.data)
-                                storyAdapter.notifyDataSetChanged()
-                            } else {
-                                GlobalConstants.show(
-                                    mainBinding.emptyState,
-                                    mainBinding.recyclerView,
-                                    mainBinding.errorState
-                                )
-                            }
-                        } else {
-                            listData.remove(null)
-                            val scrollPosition: Int = listData.size
-                            storyAdapter.notifyItemRemoved(scrollPosition)
-
-                            listData.addAll(result.data)
-                            storyAdapter.notifyDataSetChanged()
-                        }
-                    }
-
-                    else -> {
-                        hideLoading()
-                        GlobalConstants.show(
-                            mainBinding.errorState,
-                            mainBinding.recyclerView,
-                            mainBinding.emptyState
-                        )
-                    }
-                }
-            }
-        }
-    }
-
     private fun initListener() {
         storyAdapter
-            .setOnItemClickListener(object : MoStoryAdapter.onClickListener {
+            .setOnItemClickListener(object : MoPagingAdapter.OnClickListener {
                 override fun onItemClicked(data: StoryModel) {
                     Intent(this@MainActivity, DetailActivity::class.java).apply {
                         putExtra(DetailActivity.STORY_DATA, data)
@@ -210,11 +145,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchData() {
-        viewModel.fetchStories(
-            resources.getString(R.string.token_text).replace("%token%", userData.token),
-            page,
-            currentSize
-        )
+        viewModel.fetchPagingList().observe(this) {
+            hideLoading()
+            storyAdapter.submitData(lifecycle, it)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -249,17 +183,6 @@ class MainActivity : AppCompatActivity() {
         val inflater = menuInflater
         inflater.inflate(R.menu.main_menu, menu)
         return super.onCreateOptionsMenu(menu)
-    }
-
-    private fun loadMore() {
-        if (listData[listData.size - 1] != null) {
-            listData.add(null)
-            storyAdapter.notifyItemInserted(listData.size - 1)
-        }
-        Handler(mainLooper).postDelayed({
-            page++
-            fetchData()
-        }, 1000L)
     }
 
     private fun showLoading() {

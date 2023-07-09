@@ -12,6 +12,9 @@ import java.util.Locale
 
 object GlobalConstants {
     const val storageName = "momento.db"
+    const val tableName = "story"
+    const val remoteKeys = "keys"
+    const val dbName = "modatabase"
     const val keyLogin = "isLogin"
     const val keyUser = "userData"
     const val keyLocation = "location"

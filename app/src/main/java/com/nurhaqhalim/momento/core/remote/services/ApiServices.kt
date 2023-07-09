@@ -1,4 +1,4 @@
-package com.nurhaqhalim.momento.core.services
+package com.nurhaqhalim.momento.core.remote.services
 
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerCollector
