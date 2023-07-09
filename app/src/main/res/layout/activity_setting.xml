@@ -14,7 +14,7 @@
         android:text="@string/setting_theme_label"
         android:textColor="@color/title_text_color"
         android:textSize="14sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -51,12 +51,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:focusable="auto"
-        android:padding="8dp"
+        android:background="@drawable/background_secondary_button"
         android:drawableStart="@drawable/ic_language"
         android:drawablePadding="10dp"
-        android:background="@drawable/background_secondary_button"
-        android:textAllCaps="false"
-        android:text="Pilih Bahasa" />
+        android:focusable="auto"
+        android:padding="8dp"
+        android:text="Pilih Bahasa"
+        android:textAllCaps="false" />
 
 </LinearLayout>

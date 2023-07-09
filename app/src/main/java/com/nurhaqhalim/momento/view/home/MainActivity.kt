@@ -11,7 +11,6 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,6 +27,7 @@ import com.nurhaqhalim.momento.utils.GlobalConstants
 import com.nurhaqhalim.momento.utils.MarginItemDecoration
 import com.nurhaqhalim.momento.utils.StorageHelper
 import com.nurhaqhalim.momento.utils.StorageHelper.set
+import com.nurhaqhalim.momento.view.adapter.MoLoadingStateAdapter
 import com.nurhaqhalim.momento.view.adapter.MoPagingAdapter
 import com.nurhaqhalim.momento.view.auth.LoginActivity
 import com.nurhaqhalim.momento.view.maps.MapsActivity
@@ -59,12 +59,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        Toast.makeText(this, "home screen", Toast.LENGTH_SHORT).show()
         with(mainBinding) {
             showLoading()
             recyclerView.apply {
                 layoutManager = LinearLayoutManager(this@MainActivity)
-                adapter = storyAdapter
+                adapter = storyAdapter.withLoadStateFooter(
+                    footer = MoLoadingStateAdapter {
+                        storyAdapter.retry()
+                    }
+                )
                 hasFixedSize()
                 addItemDecoration(MarginItemDecoration(40, 15))
             }

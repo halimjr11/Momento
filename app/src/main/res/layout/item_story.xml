@@ -6,6 +6,7 @@
     android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="25dp"
@@ -23,9 +24,9 @@
                 android:id="@+id/item_image"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
+                android:contentDescription="@string/iv_desc_list_item"
                 android:scaleType="centerCrop"
-                tools:src="@color/grey"
-                android:contentDescription="@string/iv_desc_list_item" />
+                tools:src="@color/grey" />
 
             <TextView
                 android:id="@+id/item_title"
@@ -34,22 +35,22 @@
                 android:layout_marginHorizontal="8dp"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/poppins"
-                tools:text="@string/item_title"
                 android:textColor="@color/title_text_color"
                 android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="@string/item_title" />
 
             <TextView
                 android:id="@+id/item_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
-                android:fontFamily="@font/poppins"
                 android:ellipsize="end"
+                android:fontFamily="@font/poppins"
                 android:maxLines="1"
-                tools:text="@string/item_location"
                 android:textColor="@color/edit_text_hint_color"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                tools:text="@string/item_location" />
 
             <TextView
                 android:id="@+id/item_description"
@@ -58,11 +59,11 @@
                 android:layout_marginHorizontal="8dp"
                 android:layout_marginBottom="12dp"
                 android:ellipsize="end"
-                android:maxLines="3"
                 android:fontFamily="@font/poppins"
-                tools:text="@string/item_description"
+                android:maxLines="3"
                 android:textColor="@color/edit_text_hint_color"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                tools:text="@string/item_description" />
 
         </LinearLayout>
 

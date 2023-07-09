@@ -2,7 +2,6 @@ package com.nurhaqhalim.momento.core
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -29,8 +28,6 @@ class MoRepository(
     private val moDatabase: MoDatabase
 ) {
 
-    val storyPagingList = MutableLiveData<PagingData<StoryEntity>>()
-
     fun fetchStories(
         token: String,
         page: Int,
@@ -56,8 +53,10 @@ class MoRepository(
     fun fetchPagingList(): LiveData<PagingData<StoryEntity>> {
         return Pager(
             config = PagingConfig(
-                enablePlaceholders = true,
-                pageSize = 10
+                enablePlaceholders = false,
+                pageSize = 10,
+                initialLoadSize = 10,
+                prefetchDistance = 20
             ),
             remoteMediator = MoRemoteMediator(context, moDatabase, api),
             pagingSourceFactory = {
