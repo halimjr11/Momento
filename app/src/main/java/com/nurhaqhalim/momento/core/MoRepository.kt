@@ -56,7 +56,7 @@ class MoRepository(
                 enablePlaceholders = false,
                 pageSize = 10,
                 initialLoadSize = 10,
-                prefetchDistance = 20
+                prefetchDistance = 1
             ),
             remoteMediator = MoRemoteMediator(context, moDatabase, api),
             pagingSourceFactory = {
