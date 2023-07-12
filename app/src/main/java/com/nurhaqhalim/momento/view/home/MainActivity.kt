@@ -13,6 +13,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -40,6 +41,7 @@ import com.nurhaqhalim.momento.viewmodel.MoViewModel
 class MainActivity : AppCompatActivity() {
     private lateinit var mainBinding: ActivityMainBinding
     private lateinit var storyAdapter: MoPagingAdapter
+    private lateinit var concatAdapter: ConcatAdapter
     private lateinit var userData: UserData
     private lateinit var locationManager: LocationManager
     private val viewModel: MoViewModel by viewModels()
@@ -53,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         userData = StorageHelper.getUserData(this)
         supportActionBar?.title = resources.getText(R.string.app_name)
         storyAdapter = MoPagingAdapter()
+        concatAdapter = ConcatAdapter(storyAdapter, MoLoadingStateAdapter { storyAdapter.retry() })
         fetchData()
         initView()
         initListener()
@@ -63,11 +66,7 @@ class MainActivity : AppCompatActivity() {
             showLoading()
             recyclerView.apply {
                 layoutManager = LinearLayoutManager(this@MainActivity)
-                adapter = storyAdapter.withLoadStateFooter(
-                    footer = MoLoadingStateAdapter {
-                        storyAdapter.retry()
-                    }
-                )
+                adapter = concatAdapter
                 hasFixedSize()
                 addItemDecoration(MarginItemDecoration(40, 15))
             }
