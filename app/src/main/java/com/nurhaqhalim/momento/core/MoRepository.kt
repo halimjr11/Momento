@@ -18,6 +18,7 @@ import com.nurhaqhalim.momento.core.remote.model.RegisterResponse
 import com.nurhaqhalim.momento.core.remote.services.ApiEndpoint
 import com.nurhaqhalim.momento.model.StoryModel
 import com.nurhaqhalim.momento.utils.DataMapper
+import com.nurhaqhalim.momento.utils.MoIdlingResource
 import kotlinx.coroutines.runBlocking
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -66,10 +67,12 @@ class MoRepository(
     }
 
     fun fetchLogin(loginRequest: LoginRequest): Result<LoginResponse> {
+        MoIdlingResource.increment()
         return runBlocking {
             Result.Loading
             try {
                 val response = api.login(loginRequest)
+                MoIdlingResource.decrement()
                 Result.Success(response)
             } catch (e: Exception) {
                 Result.Error(e.message.toString())

@@ -6,14 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
+import com.airbnb.lottie.LottieDrawable
 import com.nurhaqhalim.momento.R
 import com.nurhaqhalim.momento.databinding.CustomDialogBinding
 
 
 class MoDialog : DialogFragment() {
     private lateinit var customDialogBinding: CustomDialogBinding
-    private var text = ""
-    private var animationName = ""
 
     companion object {
         private const val KEY_TITLE = "KEY_TITLE"
@@ -50,7 +49,7 @@ class MoDialog : DialogFragment() {
             textDialog.text = arguments?.getString(KEY_TITLE)
             imageDialog.apply {
                 setAnimation(arguments?.getInt(KEY_ANIMATION) ?: 0)
-                loop(true)
+                repeatCount = LottieDrawable.INFINITE
                 playAnimation()
             }
         }

@@ -150,14 +150,14 @@ class LoginActivity : AppCompatActivity() {
         )
         dialog.apply {
             show(fragmentTransaction, GlobalConstants.successTag)
-            Handler(mainLooper).postDelayed({
-                dismiss()
-                Intent(this@LoginActivity, MainActivity::class.java).apply {
-                    startActivity(this)
-                }
-                finish()
-            }, 1500L)
         }
+        Handler(mainLooper).postDelayed({
+            dialog.dismiss()
+            Intent(this@LoginActivity, MainActivity::class.java).apply {
+                startActivity(this)
+            }
+            finish()
+        }, 1500L)
     }
 
     private fun showErrorDialog() {

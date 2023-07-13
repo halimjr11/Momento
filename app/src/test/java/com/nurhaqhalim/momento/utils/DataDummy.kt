@@ -1,5 +1,6 @@
-package com.nurhaqhalim.momento
+package com.nurhaqhalim.momento.utils
 
+import androidx.recyclerview.widget.ListUpdateCallback
 import com.nurhaqhalim.momento.core.remote.model.StoriesResponse
 
 object DataDummy {
@@ -18,5 +19,12 @@ object DataDummy {
             items.add(story)
         }
         return items
+    }
+
+    val noopListUpdateCallback = object : ListUpdateCallback {
+        override fun onInserted(position: Int, count: Int) {}
+        override fun onRemoved(position: Int, count: Int) {}
+        override fun onMoved(fromPosition: Int, toPosition: Int) {}
+        override fun onChanged(position: Int, count: Int, payload: Any?) {}
     }
 }

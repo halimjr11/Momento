@@ -1,25 +1,20 @@
 package com.nurhaqhalim.momento.viewmodel
 
-import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.AsyncPagingDataDiffer
 import androidx.paging.PagingData
-import androidx.paging.PagingSource
-import androidx.paging.PagingState
-import androidx.recyclerview.widget.ListUpdateCallback
-import androidx.test.core.app.ApplicationProvider
-import com.nurhaqhalim.momento.DataDummy
-import com.nurhaqhalim.momento.MainDispatcherRule
 import com.nurhaqhalim.momento.core.MoRepository
 import com.nurhaqhalim.momento.core.local.model.StoryEntity
 import com.nurhaqhalim.momento.core.remote.model.StoriesResponse
-import com.nurhaqhalim.momento.getOrAwaitValue
+import com.nurhaqhalim.momento.utils.DataDummy
 import com.nurhaqhalim.momento.utils.DataMapper
+import com.nurhaqhalim.momento.utils.MainDispatcherRule
+import com.nurhaqhalim.momento.utils.TestPagingSource
+import com.nurhaqhalim.momento.utils.getOrAwaitValue
 import com.nurhaqhalim.momento.view.adapter.MoPagingAdapter
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -27,73 +22,79 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
-import org.robolectric.RobolectricTestRunner
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
+import org.mockito.junit.MockitoJUnitRunner
 
 @ExperimentalCoroutinesApi
-@RunWith(RobolectricTestRunner::class)
+@RunWith(MockitoJUnitRunner::class)
 class MoViewModelTest {
-    @Mock
-    val context: Application = ApplicationProvider.getApplicationContext()
 
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
+    private lateinit var viewModel: MoViewModel
+    private val emptyData = emptyList<StoriesResponse.Story>()
 
     @get:Rule
     val mainDispatcherRules = MainDispatcherRule()
 
+    @Mock
+    private lateinit var repository: MoRepository
+
     @Before
-    fun setup() {
-        MockitoAnnotations.openMocks(this)
+    fun setUp() {
+        viewModel = MoViewModel(repository)
     }
 
-    @Mock
-    private lateinit var moRepository: MoRepository
-
     @Test
-    fun `when Get Stories Should Not Null and Return Data`() = runTest {
+    fun fetchStories_onSuccess_responseShouldReturnDataAndNotNull() = runTest {
         val dummyStories = DataDummy.generateDummyStoryResponse()
-        val data: PagingData<StoryEntity> = DummyPagingSource.snapshot(dummyStories)
-        val expectedQuote = MutableLiveData<PagingData<StoryEntity>>()
-        expectedQuote.value = data
-        Mockito.`when`(moRepository.fetchPagingList()).thenReturn(expectedQuote)
+        val data: PagingData<StoryEntity> = TestPagingSource.snapshot(dummyStories)
+        val story = MutableLiveData<PagingData<StoryEntity>>()
+        story.value = data
 
-        val viewModel = MoViewModel(context)
+        `when`(repository.fetchPagingList()).thenReturn(story)
+
         val actualQuote: PagingData<StoryEntity> = viewModel.fetchPagingList().getOrAwaitValue()
 
+        verify(repository).fetchPagingList()
         val differ = AsyncPagingDataDiffer(
             diffCallback = MoPagingAdapter.DIFF_CALLBACK,
-            updateCallback = noopListUpdateCallback,
-            workerDispatcher = Dispatchers.Main,
+            updateCallback = DataDummy.noopListUpdateCallback,
+            mainDispatcher = mainDispatcherRules.testDispatcher,
+            workerDispatcher = mainDispatcherRules.testDispatcher,
         )
         differ.submitData(actualQuote)
 
+        //validate not null
         assertNotNull(differ.snapshot())
+        //validate data size
         assertEquals(dummyStories.size, differ.snapshot().size)
+        //validate first data
         assertEquals(DataMapper.storyToEntity(dummyStories[0]), differ.snapshot()[0])
     }
 
-    private val noopListUpdateCallback = object : ListUpdateCallback {
-        override fun onInserted(position: Int, count: Int) {}
-        override fun onRemoved(position: Int, count: Int) {}
-        override fun onMoved(fromPosition: Int, toPosition: Int) {}
-        override fun onChanged(position: Int, count: Int, payload: Any?) {}
-    }
-}
+    @Test
+    fun fetchStories_onSuccess_responseReturnEmptyData() = runTest {
+        val pagedData = TestPagingSource.snapshot(emptyData)
+        val story = MutableLiveData<PagingData<StoryEntity>>()
+        story.value = pagedData
 
-class DummyPagingSource : PagingSource<Int, LiveData<List<StoriesResponse.Story>>>() {
-    companion object {
-        fun snapshot(items: List<StoriesResponse.Story>): PagingData<StoryEntity> {
-            return PagingData.from(DataMapper.listStoryToEntity(items))
-        }
-    }
+        `when`(repository.fetchPagingList()).thenReturn(story)
 
-    override fun getRefreshKey(state: PagingState<Int, LiveData<List<StoriesResponse.Story>>>): Int {
-        return 0
-    }
+        val actualStory = viewModel.fetchPagingList().getOrAwaitValue()
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, LiveData<List<StoriesResponse.Story>>> {
-        return LoadResult.Page(emptyList(), 0, 1)
+        verify(repository).fetchPagingList()
+        val differ = AsyncPagingDataDiffer(
+            diffCallback = MoPagingAdapter.DIFF_CALLBACK,
+            updateCallback = DataDummy.noopListUpdateCallback,
+            mainDispatcher = mainDispatcherRules.testDispatcher,
+            workerDispatcher = mainDispatcherRules.testDispatcher,
+        )
+        differ.submitData(actualStory)
+        val actualStorySnapshot = differ.snapshot()
+        advanceUntilIdle()
+        // validate data size 0
+        assertEquals(0, actualStorySnapshot.size)
     }
 }

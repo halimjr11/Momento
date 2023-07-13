@@ -25,6 +25,7 @@ import com.nurhaqhalim.momento.model.StoryModel
 import com.nurhaqhalim.momento.model.UserData
 import com.nurhaqhalim.momento.utils.GlobalConstants
 import com.nurhaqhalim.momento.utils.MarginItemDecoration
+import com.nurhaqhalim.momento.utils.MoIdlingResource
 import com.nurhaqhalim.momento.utils.StorageHelper
 import com.nurhaqhalim.momento.utils.StorageHelper.set
 import com.nurhaqhalim.momento.view.adapter.MoLoadingStateAdapter
@@ -169,9 +170,11 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.action_logout -> {
+                MoIdlingResource.increment()
                 StorageHelper.resetUserData(this@MainActivity)
                 val storageHelper = StorageHelper.customStorage(this, GlobalConstants.storageName)
                 storageHelper[GlobalConstants.keyLogin] = false
+                MoIdlingResource.decrement()
                 Intent(this, LoginActivity::class.java).apply {
                     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     startActivity(this)

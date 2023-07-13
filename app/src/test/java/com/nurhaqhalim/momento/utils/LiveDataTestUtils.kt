@@ -1,4 +1,4 @@
-package com.nurhaqhalim.momento
+package com.nurhaqhalim.momento.utils
 
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
