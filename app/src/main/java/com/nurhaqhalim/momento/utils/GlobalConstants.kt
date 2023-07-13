@@ -17,11 +17,10 @@ object GlobalConstants {
     const val dbName = "modatabase"
     const val keyLogin = "isLogin"
     const val keyUser = "userData"
-    const val keyLocation = "location"
     const val successTag = "successDialog"
     const val failedTag = "failedDialog"
-    val successAnimation = R.raw.success
-    val failedAnimation = R.raw.failed
+    const val successAnimation = R.raw.success
+    const val failedAnimation = R.raw.failed
     const val apiUrl = "https://story-api.dicoding.dev/v1/"
 
     fun hideView(view1: View, view2: View) {

@@ -5,10 +5,9 @@ import androidx.appcompat.app.AppCompatDelegate
 
 
 object SettingUtils {
-    fun updateTheme(activity: Activity, mode: Int): Boolean {
+    fun updateTheme(activity: Activity, mode: Int) {
         AppCompatDelegate.setDefaultNightMode(mode)
         activity.recreate()
-        return true
     }
 
     fun getTheme(): Int {
