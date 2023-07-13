@@ -126,7 +126,6 @@ class MainActivity : AppCompatActivity() {
 
         val locationListener: LocationListener = object : LocationListener {
             override fun onLocationChanged(location: Location) {
-                StorageHelper.saveLocation(this@MainActivity, location)
                 locationManager.removeUpdates(this)
             }
         }
