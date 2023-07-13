@@ -94,8 +94,8 @@ class MoRepository(
         token: String,
         file: MultipartBody.Part,
         description: RequestBody,
-        latitude: RequestBody,
-        longitude: RequestBody
+        latitude: RequestBody?,
+        longitude: RequestBody?
     ): Result<AddStoryResponse> {
         return runBlocking {
             Result.Loading
