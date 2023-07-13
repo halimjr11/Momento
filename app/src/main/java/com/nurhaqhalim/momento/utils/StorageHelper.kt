@@ -2,15 +2,10 @@ package com.nurhaqhalim.momento.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.location.Location
-import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.nurhaqhalim.momento.model.UserData
 
 object StorageHelper {
-
-    fun defaultStorage(context: Context): SharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(context)
 
     fun customStorage(context: Context, name: String): SharedPreferences =
         context.getSharedPreferences(name, Context.MODE_PRIVATE)
@@ -46,7 +41,7 @@ object StorageHelper {
         }
     }
 
-    fun saveUserLogin(context : Context, userData: UserData) {
+    fun saveUserLogin(context: Context, userData: UserData) {
         val localStorage = customStorage(context, GlobalConstants.storageName)
         val json = Gson().toJson(userData)
         localStorage[GlobalConstants.keyLogin] = true
@@ -58,25 +53,11 @@ object StorageHelper {
         return Gson().fromJson(localStorage[GlobalConstants.keyUser, ""], UserData::class.java)
     }
 
-    fun saveLocation(context: Context, location: Location){
-        val localStorage = customStorage(context, GlobalConstants.storageName)
-        val json = Gson().toJson(localStorage)
-        localStorage[GlobalConstants.keyLocation] = json
-    }
 
-    fun getLocation(context: Context): Location {
-        val localStorage = customStorage(context, GlobalConstants.storageName)
-        return Gson().fromJson(localStorage[GlobalConstants.keyLocation, ""], Location::class.java)
-    }
-
-    fun resetUserData(context: Context){
-        removeData(context, GlobalConstants.keyUser)
-    }
-
-    private fun removeData(context: Context, key: String) {
+    fun resetUserData(context: Context) {
         val localStorage = customStorage(context, GlobalConstants.storageName)
         localStorage.edit().apply {
-            remove(key)
+            remove(GlobalConstants.keyUser)
             apply()
         }
     }
