@@ -22,12 +22,15 @@ import com.nurhaqhalim.momento.core.Result
 import com.nurhaqhalim.momento.core.remote.model.RegisterRequest
 import com.nurhaqhalim.momento.databinding.ActivityRegisterBinding
 import com.nurhaqhalim.momento.utils.GlobalConstants
+import com.nurhaqhalim.momento.viewmodel.MoVMFactory
 import com.nurhaqhalim.momento.viewmodel.MoViewModel
 
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var registerBinding: ActivityRegisterBinding
-    private val viewModel: MoViewModel by viewModels()
+    private val viewModel: MoViewModel by viewModels {
+        MoVMFactory(this)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         registerBinding = ActivityRegisterBinding.inflate(layoutInflater)

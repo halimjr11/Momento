@@ -1,7 +1,9 @@
 package com.nurhaqhalim.momento.view.story.detail
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import coil.load
 import com.nurhaqhalim.momento.R
@@ -11,18 +13,22 @@ import com.nurhaqhalim.momento.model.StoryModel
 import com.nurhaqhalim.momento.model.UserData
 import com.nurhaqhalim.momento.utils.GlobalConstants
 import com.nurhaqhalim.momento.utils.StorageHelper
+import com.nurhaqhalim.momento.viewmodel.MoVMFactory
 import com.nurhaqhalim.momento.viewmodel.MoViewModel
 
 class DetailActivity : AppCompatActivity() {
     private lateinit var detailBinding: ActivityDetailBinding
     private lateinit var userData: UserData
     private var storyData: StoryModel? = null
-    private val viewModel: MoViewModel by viewModels()
+    private val viewModel: MoViewModel by viewModels {
+        MoVMFactory(this)
+    }
 
     companion object {
         const val STORY_DATA = "story_data"
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         detailBinding = ActivityDetailBinding.inflate(layoutInflater)

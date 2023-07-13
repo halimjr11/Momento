@@ -25,11 +25,14 @@ import com.nurhaqhalim.momento.model.UserData
 import com.nurhaqhalim.momento.utils.GlobalConstants
 import com.nurhaqhalim.momento.utils.StorageHelper
 import com.nurhaqhalim.momento.view.home.MainActivity
+import com.nurhaqhalim.momento.viewmodel.MoVMFactory
 import com.nurhaqhalim.momento.viewmodel.MoViewModel
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var authBinding: ActivityLoginBinding
-    private val viewModel: MoViewModel by viewModels()
+    private val viewModel: MoViewModel by viewModels {
+        MoVMFactory(this)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         authBinding = ActivityLoginBinding.inflate(layoutInflater)
