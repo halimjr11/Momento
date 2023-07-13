@@ -12,6 +12,8 @@
     <color name="title_text_color">@color/white</color>
     <color name="desc_text_color">@color/grey</color>
     <color name="button_secondary_bg">@color/location_text</color>
+    <color name="location_border">#FAF0D7</color>
+    <color name="location_bg">#FFC95F</color>
     <color name="fab_bg">@color/orange_dark</color>
     <color name="white_30">#33FFFFFF</color>
 </resources>

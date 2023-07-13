@@ -1,7 +1,6 @@
 package com.nurhaqhalim.momento.view.home
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.location.Criteria
@@ -13,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -34,15 +34,18 @@ import com.nurhaqhalim.momento.view.maps.MapsActivity
 import com.nurhaqhalim.momento.view.settings.SettingActivity
 import com.nurhaqhalim.momento.view.story.add.AddStoryActivity
 import com.nurhaqhalim.momento.view.story.detail.DetailActivity
+import com.nurhaqhalim.momento.viewmodel.MoVMFactory
 import com.nurhaqhalim.momento.viewmodel.MoViewModel
 
-@SuppressLint("NotifyDataSetChanged")
 class MainActivity : AppCompatActivity() {
     private lateinit var mainBinding: ActivityMainBinding
     private lateinit var storyAdapter: MoPagingAdapter
+    private lateinit var concatAdapter: ConcatAdapter
     private lateinit var userData: UserData
     private lateinit var locationManager: LocationManager
-    private val viewModel: MoViewModel by viewModels()
+    private val viewModel: MoViewModel by viewModels {
+        MoVMFactory(this)
+    }
     private val minDistanceForUpdates: Float = 10f
     private val minTimesBetweenUpdates: Long = 1000
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         userData = StorageHelper.getUserData(this)
         supportActionBar?.title = resources.getText(R.string.app_name)
         storyAdapter = MoPagingAdapter()
+        concatAdapter = ConcatAdapter(storyAdapter, MoLoadingStateAdapter { storyAdapter.retry() })
         fetchData()
         initView()
         initListener()
@@ -63,11 +67,7 @@ class MainActivity : AppCompatActivity() {
             showLoading()
             recyclerView.apply {
                 layoutManager = LinearLayoutManager(this@MainActivity)
-                adapter = storyAdapter.withLoadStateFooter(
-                    footer = MoLoadingStateAdapter {
-                        storyAdapter.retry()
-                    }
-                )
+                adapter = concatAdapter
                 hasFixedSize()
                 addItemDecoration(MarginItemDecoration(40, 15))
             }

@@ -56,7 +56,7 @@ class MoRepository(
                 enablePlaceholders = false,
                 pageSize = 10,
                 initialLoadSize = 10,
-                prefetchDistance = 20
+                prefetchDistance = 1
             ),
             remoteMediator = MoRemoteMediator(context, moDatabase, api),
             pagingSourceFactory = {
@@ -94,8 +94,8 @@ class MoRepository(
         token: String,
         file: MultipartBody.Part,
         description: RequestBody,
-        latitude: RequestBody,
-        longitude: RequestBody
+        latitude: RequestBody?,
+        longitude: RequestBody?
     ): Result<AddStoryResponse> {
         return runBlocking {
             Result.Loading

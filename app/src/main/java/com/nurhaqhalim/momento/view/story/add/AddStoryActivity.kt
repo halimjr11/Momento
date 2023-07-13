@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.provider.MediaStore
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -19,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat.checkSelfPermission
 import androidx.core.app.ActivityCompat.requestPermissions
 import coil.load
+import com.google.android.material.snackbar.Snackbar
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
@@ -33,6 +33,7 @@ import com.nurhaqhalim.momento.model.UserData
 import com.nurhaqhalim.momento.utils.GlobalConstants
 import com.nurhaqhalim.momento.utils.StorageHelper
 import com.nurhaqhalim.momento.view.home.MainActivity
+import com.nurhaqhalim.momento.viewmodel.MoVMFactory
 import com.nurhaqhalim.momento.viewmodel.MoViewModel
 import fr.quentinklein.slt.LocationTracker
 import fr.quentinklein.slt.ProviderError
@@ -58,7 +59,9 @@ class AddStoryActivity : AppCompatActivity() {
     private lateinit var takePhoto: ActivityResultLauncher<Intent>
     private lateinit var userData: UserData
     private var savePermission: Boolean = false
-    private val viewModel: MoViewModel by viewModels()
+    private val viewModel: MoViewModel by viewModels {
+        MoVMFactory(this)
+    }
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private val requestPermissionCode: Int = 100
@@ -135,6 +138,8 @@ class AddStoryActivity : AppCompatActivity() {
             override fun onLocationFound(location: Location) {
                 latitude = location.latitude
                 longitude = location.longitude
+                addStoryBinding.locationText.text =
+                    GlobalConstants.getAddress(this@AddStoryActivity, latitude, longitude)
                 locationTracker.stopListening()
             }
 
@@ -177,6 +182,16 @@ class AddStoryActivity : AppCompatActivity() {
             buttonAdd.setOnClickListener {
                 val description = edAddDescription.text.toString().trim()
 
+                if (description.isEmpty()) {
+                    edAddDescription.error = resources.getString(R.string.validation_required_text)
+                    Snackbar.make(
+                        addStoryBinding.root,
+                        "Description is required",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
+
                 val descriptions = description.toRequestBody("text/plain".toMediaType())
                 val latitudes =
                     latitude.toFloat().toString().toRequestBody("text/plain".toMediaType())
@@ -185,15 +200,12 @@ class AddStoryActivity : AppCompatActivity() {
 
                 val filePart = MultipartBody.Part.createFormData("photo", fileName, fileRequestBody)
 
-                Toast.makeText(this@AddStoryActivity, "udah ke klik pak!", Toast.LENGTH_SHORT)
-                    .show()
-
                 viewModel.fetchAddStoryUser(
                     resources.getString(R.string.token_text).replace("%token%", userData.token),
                     filePart,
                     descriptions,
-                    latitudes,
-                    longitudes
+                    if (addStoryBinding.locationState.isActivated) latitudes else null,
+                    if (addStoryBinding.locationState.isActivated) longitudes else null
                 )
             }
         }
