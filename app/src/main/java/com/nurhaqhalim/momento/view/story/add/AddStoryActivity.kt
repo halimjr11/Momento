@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.location.Location
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -20,10 +21,12 @@ import androidx.core.app.ActivityCompat.requestPermissions
 import coil.load
 import com.google.android.material.snackbar.Snackbar
 import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.karumi.dexter.listener.single.PermissionListener
 import com.nurhaqhalim.momento.R
 import com.nurhaqhalim.momento.components.MoDialog
@@ -172,7 +175,6 @@ class AddStoryActivity : AppCompatActivity() {
         with(addStoryBinding) {
             buttonCamera.setOnClickListener {
                 saveFilePermission()
-                checkCameraPermission()
             }
 
             buttonGallery.setOnClickListener {
@@ -296,6 +298,7 @@ class AddStoryActivity : AppCompatActivity() {
                 if (response != null) {
                     if (response.permissionName == Manifest.permission.WRITE_EXTERNAL_STORAGE) {
                         savePermission = true
+                        checkCameraPermission()
                     }
                 }
             }
@@ -346,23 +349,46 @@ class AddStoryActivity : AppCompatActivity() {
     }
 
     private fun checkGalleryPermission() {
-        Dexter.withContext(this).withPermission(
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        ).withListener(object : PermissionListener {
-            override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                if (response != null) {
-                    if (response.permissionName == Manifest.permission.READ_EXTERNAL_STORAGE) actionGallery()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Dexter.withContext(this).withPermissions(
+                Manifest.permission.READ_MEDIA_AUDIO,
+                Manifest.permission.READ_MEDIA_IMAGES,
+                Manifest.permission.READ_MEDIA_VIDEO
+            ).withListener(object : MultiplePermissionsListener {
+                override fun onPermissionsChecked(p0: MultiplePermissionsReport?) {
+                    if (p0?.grantedPermissionResponses != null) {
+                        if (p0.areAllPermissionsGranted()) actionGallery()
+                    }
                 }
-            }
 
-            override fun onPermissionDenied(p0: PermissionDeniedResponse?) {}
+                override fun onPermissionRationaleShouldBeShown(
+                    p0: MutableList<PermissionRequest>?,
+                    p1: PermissionToken?
+                ) {
+                    TODO("Not yet implemented")
+                }
 
-            override fun onPermissionRationaleShouldBeShown(
-                p0: PermissionRequest?, p1: PermissionToken?
-            ) {
-            }
 
-        }).onSameThread().check()
+            }).onSameThread().check()
+        } else {
+            Dexter.withContext(this).withPermission(
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ).withListener(object : PermissionListener {
+                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                    if (response != null) {
+                        if (response.permissionName == Manifest.permission.READ_EXTERNAL_STORAGE) actionGallery()
+                    }
+                }
+
+                override fun onPermissionDenied(p0: PermissionDeniedResponse?) {}
+
+                override fun onPermissionRationaleShouldBeShown(
+                    p0: PermissionRequest?, p1: PermissionToken?
+                ) {
+                }
+
+            }).onSameThread().check()
+        }
     }
 
     private fun actionGallery() {
