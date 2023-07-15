@@ -15,6 +15,7 @@ import android.provider.MediaStore
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat.checkSelfPermission
 import androidx.core.app.ActivityCompat.requestPermissions
@@ -291,32 +292,36 @@ class AddStoryActivity : AppCompatActivity() {
     }
 
     private fun saveFilePermission() {
-        Dexter.withContext(this).withPermission(
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ).withListener(object : PermissionListener {
-            override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                if (response != null) {
-                    if (response.permissionName == Manifest.permission.WRITE_EXTERNAL_STORAGE) {
-                        savePermission = true
-                        checkCameraPermission()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            sdk33MediaPermission()
+        } else {
+            Dexter.withContext(this).withPermission(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ).withListener(object : PermissionListener {
+                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                    if (response != null) {
+                        if (response.permissionName == Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+                            savePermission = true
+                            checkCameraPermission()
+                        }
                     }
                 }
-            }
 
-            override fun onPermissionDenied(response: PermissionDeniedResponse?) {
-                if (response != null) {
-                    if (response.permissionName == Manifest.permission.WRITE_EXTERNAL_STORAGE) {
-                        savePermission = false
+                override fun onPermissionDenied(response: PermissionDeniedResponse?) {
+                    if (response != null) {
+                        if (response.permissionName == Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+                            savePermission = false
+                        }
                     }
                 }
-            }
 
-            override fun onPermissionRationaleShouldBeShown(
-                p0: PermissionRequest?, p1: PermissionToken?
-            ) {
-            }
+                override fun onPermissionRationaleShouldBeShown(
+                    p0: PermissionRequest?, p1: PermissionToken?
+                ) {
+                }
 
-        }).onSameThread().check()
+            }).onSameThread().check()
+        }
     }
 
     private fun retrieveFile(file: File) {
@@ -350,26 +355,7 @@ class AddStoryActivity : AppCompatActivity() {
 
     private fun checkGalleryPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Dexter.withContext(this).withPermissions(
-                Manifest.permission.READ_MEDIA_AUDIO,
-                Manifest.permission.READ_MEDIA_IMAGES,
-                Manifest.permission.READ_MEDIA_VIDEO
-            ).withListener(object : MultiplePermissionsListener {
-                override fun onPermissionsChecked(p0: MultiplePermissionsReport?) {
-                    if (p0?.grantedPermissionResponses != null) {
-                        if (p0.areAllPermissionsGranted()) actionGallery()
-                    }
-                }
-
-                override fun onPermissionRationaleShouldBeShown(
-                    p0: MutableList<PermissionRequest>?,
-                    p1: PermissionToken?
-                ) {
-                    TODO("Not yet implemented")
-                }
-
-
-            }).onSameThread().check()
+            sdk33MediaPermission()
         } else {
             Dexter.withContext(this).withPermission(
                 Manifest.permission.READ_EXTERNAL_STORAGE
@@ -389,6 +375,30 @@ class AddStoryActivity : AppCompatActivity() {
 
             }).onSameThread().check()
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun sdk33MediaPermission() {
+        Dexter.withContext(this).withPermissions(
+            Manifest.permission.READ_MEDIA_AUDIO,
+            Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.READ_MEDIA_VIDEO
+        ).withListener(object : MultiplePermissionsListener {
+            override fun onPermissionsChecked(p0: MultiplePermissionsReport?) {
+                if (p0?.grantedPermissionResponses != null) {
+                    if (p0.areAllPermissionsGranted()) actionGallery()
+                }
+            }
+
+            override fun onPermissionRationaleShouldBeShown(
+                p0: MutableList<PermissionRequest>?,
+                p1: PermissionToken?
+            ) {
+                TODO("Not yet implemented")
+            }
+
+
+        }).onSameThread().check()
     }
 
     private fun actionGallery() {
