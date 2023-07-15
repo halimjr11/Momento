@@ -63,6 +63,7 @@ class AddStoryActivity : AppCompatActivity() {
     private lateinit var takePhoto: ActivityResultLauncher<Intent>
     private lateinit var userData: UserData
     private var savePermission: Boolean = false
+    private var isCamera: Boolean = false
     private val viewModel: MoViewModel by viewModels {
         MoVMFactory(this)
     }
@@ -293,6 +294,7 @@ class AddStoryActivity : AppCompatActivity() {
 
     private fun saveFilePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            isCamera = true
             sdk33MediaPermission()
         } else {
             Dexter.withContext(this).withPermission(
@@ -386,7 +388,10 @@ class AddStoryActivity : AppCompatActivity() {
         ).withListener(object : MultiplePermissionsListener {
             override fun onPermissionsChecked(p0: MultiplePermissionsReport?) {
                 if (p0?.grantedPermissionResponses != null) {
-                    if (p0.areAllPermissionsGranted()) actionGallery()
+                    if (p0.areAllPermissionsGranted()) {
+                        if (isCamera) actionCamera() else actionGallery()
+                        isCamera = false
+                    }
                 }
             }
 
