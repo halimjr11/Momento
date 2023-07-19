@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -51,6 +52,7 @@ import java.io.File
 class AddStoryActivity : AppCompatActivity() {
     private lateinit var addStoryBinding: ActivityAddStoryBinding
     private lateinit var fileRequestBody: RequestBody
+    private lateinit var locationTracker: LocationTracker
     private lateinit var pickPhoto: ActivityResultLauncher<Intent>
     private lateinit var takePhoto: ActivityResultLauncher<Intent>
     private lateinit var userData: UserData
@@ -120,7 +122,7 @@ class AddStoryActivity : AppCompatActivity() {
         val shouldUseGPS = true
         val shouldUseNetwork = true
         val shouldUsePassive = true
-        val locationTracker = LocationTracker(
+        locationTracker = LocationTracker(
             minTimeBetweenUpdates,
             minDistanceBetweenUpdates,
             shouldUseGPS,
@@ -134,14 +136,12 @@ class AddStoryActivity : AppCompatActivity() {
                 longitude = location.longitude
                 addStoryBinding.locationText.text =
                     GlobalConstants.getAddress(this@AddStoryActivity, latitude, longitude)
-                locationTracker.stopListening()
             }
 
             override fun onProviderError(providerError: ProviderError) {
             }
 
         })
-
         if (checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -163,6 +163,7 @@ class AddStoryActivity : AppCompatActivity() {
     }
 
     private fun initListener() {
+        var locationChoice = false
         with(addStoryBinding) {
             buttonCamera.setOnClickListener {
                 actionCamera()
@@ -170,6 +171,10 @@ class AddStoryActivity : AppCompatActivity() {
 
             buttonGallery.setOnClickListener {
                 if (checkMediaPermissions()) actionGallery() else checkGalleryPermission()
+            }
+
+            locationState.setOnCheckedChangeListener { _, isChecked ->
+                locationChoice = isChecked
             }
 
             buttonAdd.setOnClickListener {
@@ -202,12 +207,13 @@ class AddStoryActivity : AppCompatActivity() {
 
                 val filePart = MultipartBody.Part.createFormData("photo", fileName, fileRequestBody)
 
+
                 viewModel.fetchAddStoryUser(
                     resources.getString(R.string.token_text).replace("%token%", userData.token),
                     filePart,
                     descriptions,
-                    if (addStoryBinding.locationState.isActivated) latitudes else null,
-                    if (addStoryBinding.locationState.isActivated) longitudes else null
+                    if (locationChoice) latitudes else null,
+                    if (locationChoice) longitudes else null
                 )
             }
         }
@@ -350,6 +356,11 @@ class AddStoryActivity : AppCompatActivity() {
     private fun actionCamera() {
         val cameraXIntent = Intent(this@AddStoryActivity, CameraActivity::class.java)
         takePhoto.launch(cameraXIntent)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        locationTracker.stopListening()
     }
 
     companion object {
