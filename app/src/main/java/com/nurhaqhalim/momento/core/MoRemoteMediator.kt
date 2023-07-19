@@ -55,7 +55,7 @@ class MoRemoteMediator(
 
 
         return try {
-            val responseData = moApi.getStories(token, page, state.config.pageSize, 1)
+            val responseData = moApi.getStories(token, page, state.config.pageSize)
             val endOfPaginationReached = responseData.listStory.isEmpty()
             moDatabase.withTransaction {
                 if (loadType == LoadType.REFRESH) {

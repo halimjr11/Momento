@@ -51,10 +51,10 @@ import java.io.File
 class AddStoryActivity : AppCompatActivity() {
     private lateinit var addStoryBinding: ActivityAddStoryBinding
     private lateinit var fileRequestBody: RequestBody
-    private lateinit var fileName: String
     private lateinit var pickPhoto: ActivityResultLauncher<Intent>
     private lateinit var takePhoto: ActivityResultLauncher<Intent>
     private lateinit var userData: UserData
+    private var fileName: String = ""
     private val viewModel: MoViewModel by viewModels {
         MoVMFactory(this)
     }
@@ -173,6 +173,15 @@ class AddStoryActivity : AppCompatActivity() {
             }
 
             buttonAdd.setOnClickListener {
+                if (fileName.isEmpty()) {
+                    Snackbar.make(
+                        addStoryBinding.root,
+                        "Tidak ada gambar terpilih!",
+                        Snackbar.LENGTH_SHORT
+                    ).setBackgroundTint(resources.getColor(R.color.fab_bg, null)).show()
+                    return@setOnClickListener
+                }
+
                 val description = edAddDescription.text.toString().trim()
 
                 if (description.isEmpty()) {
@@ -181,7 +190,7 @@ class AddStoryActivity : AppCompatActivity() {
                         addStoryBinding.root,
                         "Description is required",
                         Snackbar.LENGTH_SHORT
-                    ).show()
+                    ).setBackgroundTint(resources.getColor(R.color.fab_bg, null)).show()
                     return@setOnClickListener
                 }
 
