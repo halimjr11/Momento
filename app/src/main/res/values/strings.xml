@@ -22,7 +22,7 @@
     <string name="register_success_text">Successful register to the system</string>
     <string name="login_failed_text">Login failed </string>
     <string name="register_failed_text">Register failed </string>
-    <string name="token_text" translatable="false">Bearer %token%</string>
+    <string name="token_text">Bearer %token%</string>
     <string name="unknown_location_text">Location is not found</string>
     <string name="logout_menu_text">Logout</string>
     <string name="fab_description">Add story button</string>

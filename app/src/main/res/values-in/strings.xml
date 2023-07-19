@@ -22,7 +22,7 @@
     <string name="register_success_text">Daftar ke sistem sukses</string>
     <string name="login_failed_text">Login gagal</string>
     <string name="register_failed_text">Pendaftaran gagal</string>
-    <string name="token_text" translatable="false">Bearer %token%</string>
+    <string name="token_text">Bearer %token%</string>
     <string name="unknown_location_text">Lokasi tidak ditemukan</string>
     <string name="logout_menu_text">Logout</string>
     <string name="fab_description">Tombol tambah story</string>
