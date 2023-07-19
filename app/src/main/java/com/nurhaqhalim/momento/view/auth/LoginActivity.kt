@@ -33,6 +33,7 @@ class LoginActivity : AppCompatActivity() {
     private val viewModel: MoViewModel by viewModels {
         MoVMFactory(this)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         authBinding = ActivityLoginBinding.inflate(layoutInflater)

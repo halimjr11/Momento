@@ -1,5 +1,6 @@
 package com.nurhaqhalim.momento.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
@@ -10,7 +11,10 @@ import okio.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+@SuppressLint("NonConstantResourceId")
 object GlobalConstants {
+    const val cameraTag = "camerax"
+    const val fileNameFormat = "yy-MM-dd-HH-mm-ss-SSS"
     const val storageName = "momento.db"
     const val tableName = "story"
     const val remoteKeys = "keys"

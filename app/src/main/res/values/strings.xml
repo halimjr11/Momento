@@ -52,6 +52,10 @@
     <string name="settings_title_text">Settings</string>
     <string name="add_story_title_text">Add Story</string>
     <string name="detail_story_title_text">Story Detail</string>
+    <string name="capture">Capture</string>
+    <string name="failed_start_camera">Tidak bisa mengambil gambar</string>
+    <string name="message_permission_granted">Berhasil membuka kamera</string>
+    <string name="failed_save_file">Gagal menyimpan gambar!</string>
     <string-array name="themes">
         <item>@string/setting_theme_system</item>
         <item>@string/setting_theme_light</item>
