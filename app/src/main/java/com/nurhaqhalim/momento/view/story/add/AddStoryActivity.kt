@@ -4,26 +4,28 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.location.Location
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
-import android.provider.MediaStore
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat.checkSelfPermission
 import androidx.core.app.ActivityCompat.requestPermissions
+import androidx.core.content.ContextCompat
 import coil.load
 import com.google.android.material.snackbar.Snackbar
 import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.karumi.dexter.listener.single.PermissionListener
 import com.nurhaqhalim.momento.R
 import com.nurhaqhalim.momento.components.MoDialog
@@ -44,21 +46,15 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 
 class AddStoryActivity : AppCompatActivity() {
     private lateinit var addStoryBinding: ActivityAddStoryBinding
     private lateinit var fileRequestBody: RequestBody
     private lateinit var fileName: String
-    private lateinit var pickPhoto: ActivityResultLauncher<String>
+    private lateinit var pickPhoto: ActivityResultLauncher<Intent>
     private lateinit var takePhoto: ActivityResultLauncher<Intent>
     private lateinit var userData: UserData
-    private var savePermission: Boolean = false
     private val viewModel: MoViewModel by viewModels {
         MoVMFactory(this)
     }
@@ -73,29 +69,27 @@ class AddStoryActivity : AppCompatActivity() {
         supportActionBar?.title = resources.getString(R.string.add_story_title_text)
         getLocations()
         userData = StorageHelper.getUserData(this)
-        takePhoto = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            if (result.resultCode == RESULT_OK && result.data != null) {
-                val extra = result.data?.extras
-                val data = extra?.get("data") as Bitmap
-
-                if (savePermission) {
-                    saveBitmapToFile(this, data)?.let {
-                        retrieveFile(it)
-                    }
+        takePhoto = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                val uriString = it.data?.getStringExtra(GlobalConstants.cameraTag)
+                val uri: Uri = Uri.parse(uriString)
+                val file = getFileFromContentUri(this, uri)
+                if (file != null) {
+                    retrieveFile(file)
                 }
             }
         }
 
-        pickPhoto = registerForActivityResult(
-            ActivityResultContracts.GetContent()
-        ) {
-            val file = it?.let { uri -> getFileFromContentUri(this, uri) }
-            if (file != null) {
-                retrieveFile(file)
+        pickPhoto =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    val uri: Uri = result.data?.data as Uri
+                    val file = getFileFromContentUri(this, uri)
+                    if (file != null) {
+                        retrieveFile(file)
+                    }
+                }
             }
-        }
         initListener()
         initLiveData()
     }
@@ -171,12 +165,11 @@ class AddStoryActivity : AppCompatActivity() {
     private fun initListener() {
         with(addStoryBinding) {
             buttonCamera.setOnClickListener {
-                saveFilePermission()
-                checkCameraPermission()
+                actionCamera()
             }
 
             buttonGallery.setOnClickListener {
-                checkGalleryPermission()
+                if (checkMediaPermissions()) actionGallery() else checkGalleryPermission()
             }
 
             buttonAdd.setOnClickListener {
@@ -209,6 +202,22 @@ class AddStoryActivity : AppCompatActivity() {
                 )
             }
         }
+    }
+
+    private fun checkMediaPermissions(): Boolean {
+        var allPermissionsGranted = true
+
+        for (permission in if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) mediaPermissions else mediaPermission) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    permission
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                allPermissionsGranted = false
+                break
+            }
+        }
+        return allPermissionsGranted
     }
 
     private fun showSuccessDialog() {
@@ -264,58 +273,6 @@ class AddStoryActivity : AppCompatActivity() {
         return File.createTempFile(fileName, null, directory)
     }
 
-    private fun saveBitmapToFile(context: Context, bitmap: Bitmap): File? {
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val fileName = "IMG_$timeStamp.png"
-
-        val directory =
-            File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "YourFolderName")
-        if (!directory.exists()) {
-            directory.mkdirs()
-        }
-
-        val imageFile = File(directory, fileName)
-
-        return try {
-            val outputStream = FileOutputStream(imageFile)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            outputStream.flush()
-            outputStream.close()
-            imageFile
-        } catch (e: IOException) {
-            e.printStackTrace()
-            null
-        }
-    }
-
-    private fun saveFilePermission() {
-        Dexter.withContext(this).withPermission(
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ).withListener(object : PermissionListener {
-            override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                if (response != null) {
-                    if (response.permissionName == Manifest.permission.WRITE_EXTERNAL_STORAGE) {
-                        savePermission = true
-                    }
-                }
-            }
-
-            override fun onPermissionDenied(response: PermissionDeniedResponse?) {
-                if (response != null) {
-                    if (response.permissionName == Manifest.permission.WRITE_EXTERNAL_STORAGE) {
-                        savePermission = false
-                    }
-                }
-            }
-
-            override fun onPermissionRationaleShouldBeShown(
-                p0: PermissionRequest?, p1: PermissionToken?
-            ) {
-            }
-
-        }).onSameThread().check()
-    }
-
     private fun retrieveFile(file: File) {
         addStoryBinding.ivPreview.load(file)
         val image = File(file.absolutePath)
@@ -323,55 +280,78 @@ class AddStoryActivity : AppCompatActivity() {
         fileRequestBody = image.asRequestBody("multipart/form-data".toMediaTypeOrNull())
     }
 
-    private fun checkCameraPermission() {
-        Dexter.withContext(this).withPermission(
-            Manifest.permission.CAMERA
-        ).withListener(object : PermissionListener {
-            override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                if (response != null) {
-                    if (response.permissionName == Manifest.permission.CAMERA) {
-                        actionCamera()
+    private fun checkGalleryPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            sdk33MediaPermission()
+        } else {
+            Dexter.withContext(this).withPermission(
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ).withListener(object : PermissionListener {
+                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                    if (response != null) {
+                        if (response.permissionName == Manifest.permission.READ_EXTERNAL_STORAGE) actionGallery()
                     }
                 }
-            }
 
-            override fun onPermissionDenied(p0: PermissionDeniedResponse?) {}
+                override fun onPermissionDenied(p0: PermissionDeniedResponse?) {}
 
-            override fun onPermissionRationaleShouldBeShown(
-                p0: PermissionRequest?, p1: PermissionToken?
-            ) {
-            }
+                override fun onPermissionRationaleShouldBeShown(
+                    p0: PermissionRequest?, p1: PermissionToken?
+                ) {
+                }
 
-        }).onSameThread().check()
+            }).onSameThread().check()
+        }
     }
 
-    private fun checkGalleryPermission() {
-        Dexter.withContext(this).withPermission(
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        ).withListener(object : PermissionListener {
-            override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                if (response != null) {
-                    if (response.permissionName == Manifest.permission.READ_EXTERNAL_STORAGE) actionGallery()
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun sdk33MediaPermission() {
+        Dexter.withContext(this).withPermissions(
+            Manifest.permission.READ_MEDIA_AUDIO,
+            Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.READ_MEDIA_VIDEO
+        ).withListener(object : MultiplePermissionsListener {
+            override fun onPermissionsChecked(p0: MultiplePermissionsReport?) {
+                if (p0?.grantedPermissionResponses != null) {
+                    actionGallery()
                 }
             }
 
-            override fun onPermissionDenied(p0: PermissionDeniedResponse?) {}
-
             override fun onPermissionRationaleShouldBeShown(
-                p0: PermissionRequest?, p1: PermissionToken?
+                p0: MutableList<PermissionRequest>?,
+                p1: PermissionToken?
             ) {
+                TODO("Not yet implemented")
             }
+
 
         }).onSameThread().check()
     }
 
     private fun actionGallery() {
-        pickPhoto.launch("image/*")
+        val intentGallery = Intent()
+        intentGallery.action = Intent.ACTION_GET_CONTENT
+        intentGallery.type = "image/*"
+
+        val chooseImage =
+            Intent.createChooser(intentGallery, resources.getString(R.string.button_gallery_text))
+        pickPhoto.launch(chooseImage)
     }
 
     private fun actionCamera() {
-        Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
-            takePhoto.launch(this)
-        }
+        val cameraXIntent = Intent(this@AddStoryActivity, CameraActivity::class.java)
+        takePhoto.launch(cameraXIntent)
+    }
+
+    companion object {
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        val mediaPermissions = arrayListOf(
+            Manifest.permission.READ_MEDIA_VIDEO,
+            Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.READ_MEDIA_AUDIO
+        )
+        val mediaPermission = arrayListOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
     }
 }

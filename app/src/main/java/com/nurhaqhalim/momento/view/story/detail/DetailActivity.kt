@@ -24,10 +24,6 @@ class DetailActivity : AppCompatActivity() {
         MoVMFactory(this)
     }
 
-    companion object {
-        const val STORY_DATA = "story_data"
-    }
-
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,4 +89,7 @@ class DetailActivity : AppCompatActivity() {
         )
     }
 
+    companion object {
+        const val STORY_DATA = "story_data"
+    }
 }
