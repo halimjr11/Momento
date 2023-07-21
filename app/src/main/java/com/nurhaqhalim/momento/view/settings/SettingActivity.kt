@@ -55,7 +55,7 @@ class SettingActivity : AppCompatActivity() {
                             .newEditable(resources.getString(R.string.setting_theme_system))
                     }
                 }
-                setOnItemClickListener { adapterView, view, position, id ->
+                setOnItemClickListener { _, _, position, _ ->
                     when (settingThemeModel.title[position]) {
                         R.string.setting_theme_system -> {
                             SettingUtils.updateTheme(
